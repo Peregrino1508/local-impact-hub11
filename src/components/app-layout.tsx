@@ -49,7 +49,7 @@ export function AppLayout({
             <MessageCircle className="size-5 text-primary-foreground" />
           </div>
           <div className="font-semibold text-lg leading-tight">
-            Influence <span className="text-primary">Local</span>
+            Projeto <span className="text-primary">Influencer</span>
           </div>
         </div>
 
@@ -85,7 +85,7 @@ export function AppLayout({
             </button>
           </div>
           <div className="text-[11px] text-sidebar-foreground/50 mt-3 px-1">
-            Influence Local · © 2026
+            Projeto Influencer · © 2026
           </div>
         </div>
       </aside>
