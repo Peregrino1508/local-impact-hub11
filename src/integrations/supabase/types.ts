@@ -14,7 +14,335 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      campaign_influencers: {
+        Row: {
+          campaign_id: string
+          coupon: string
+          created_at: string
+          id: string
+          influencer_id: string
+          post_status: string
+          proof_status: string
+          updated_at: string
+          views_delivered: number
+        }
+        Insert: {
+          campaign_id: string
+          coupon: string
+          created_at?: string
+          id?: string
+          influencer_id: string
+          post_status?: string
+          proof_status?: string
+          updated_at?: string
+          views_delivered?: number
+        }
+        Update: {
+          campaign_id?: string
+          coupon?: string
+          created_at?: string
+          id?: string
+          influencer_id?: string
+          post_status?: string
+          proof_status?: string
+          updated_at?: string
+          views_delivered?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_influencers_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_influencers_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          client_id: string
+          client_price: number
+          cpm_commercial: number
+          cpm_internal: number
+          created_at: string
+          creative: string | null
+          duration_hours: number
+          general_coupon: string | null
+          id: string
+          name: string
+          notes: string | null
+          product: string
+          start_date: string
+          status: string
+          updated_at: string
+          views_goal: number
+        }
+        Insert: {
+          client_id: string
+          client_price?: number
+          cpm_commercial?: number
+          cpm_internal?: number
+          created_at?: string
+          creative?: string | null
+          duration_hours?: number
+          general_coupon?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          product: string
+          start_date: string
+          status?: string
+          updated_at?: string
+          views_goal?: number
+        }
+        Update: {
+          client_id?: string
+          client_price?: number
+          cpm_commercial?: number
+          cpm_internal?: number
+          created_at?: string
+          creative?: string | null
+          duration_hours?: number
+          general_coupon?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          product?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          views_goal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          campaigns: number
+          city: string
+          company: string
+          created_at: string
+          email: string
+          id: string
+          notes: string | null
+          responsible: string
+          segment: string
+          status: string
+          total_invested: number
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          campaigns?: number
+          city: string
+          company: string
+          created_at?: string
+          email: string
+          id?: string
+          notes?: string | null
+          responsible: string
+          segment: string
+          status?: string
+          total_invested?: number
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          campaigns?: number
+          city?: string
+          company?: string
+          created_at?: string
+          email?: string
+          id?: string
+          notes?: string | null
+          responsible?: string
+          segment?: string
+          status?: string
+          total_invested?: number
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      influencers: {
+        Row: {
+          avg_views: number
+          city: string
+          cpm_internal: number
+          created_at: string
+          id: string
+          instagram: string | null
+          last_campaign: string | null
+          name: string
+          neighborhood: string
+          niche: string
+          notes: string | null
+          public_name: string
+          reliability: string
+          status: string
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          avg_views?: number
+          city: string
+          cpm_internal?: number
+          created_at?: string
+          id?: string
+          instagram?: string | null
+          last_campaign?: string | null
+          name: string
+          neighborhood: string
+          niche: string
+          notes?: string | null
+          public_name: string
+          reliability?: string
+          status?: string
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          avg_views?: number
+          city?: string
+          cpm_internal?: number
+          created_at?: string
+          id?: string
+          instagram?: string | null
+          last_campaign?: string | null
+          name?: string
+          neighborhood?: string
+          niche?: string
+          notes?: string | null
+          public_name?: string
+          reliability?: string
+          status?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          campaign_id: string
+          created_at: string
+          due_date: string
+          id: string
+          influencer_id: string
+          status: string
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          amount?: number
+          campaign_id: string
+          created_at?: string
+          due_date: string
+          id?: string
+          influencer_id: string
+          status?: string
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          influencer_id?: string
+          status?: string
+          updated_at?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proofs: {
+        Row: {
+          campaign_id: string
+          collected_at: string
+          created_at: string
+          id: string
+          image_url: string
+          influencer_id: string
+          published_at: string
+          status: string
+          type: string
+          updated_at: string
+          views: number
+        }
+        Insert: {
+          campaign_id: string
+          collected_at: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          influencer_id: string
+          published_at: string
+          status?: string
+          type: string
+          updated_at?: string
+          views?: number
+        }
+        Update: {
+          campaign_id?: string
+          collected_at?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          influencer_id?: string
+          published_at?: string
+          status?: string
+          type?: string
+          updated_at?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proofs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proofs_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
