@@ -18,6 +18,7 @@ import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as CampanhasRouteImport } from './routes/campanhas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CampanhasIdRouteImport } from './routes/campanhas.$id'
+import { Route as ApiSeedRouteImport } from './routes/api.seed'
 
 const RelatoriosRoute = RelatoriosRouteImport.update({
   id: '/relatorios',
@@ -64,6 +65,11 @@ const CampanhasIdRoute = CampanhasIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => CampanhasRoute,
 } as any)
+const ApiSeedRoute = ApiSeedRouteImport.update({
+  id: '/api/seed',
+  path: '/api/seed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/influencers': typeof InfluencersRoute
   '/provas': typeof ProvasRoute
   '/relatorios': typeof RelatoriosRoute
+  '/api/seed': typeof ApiSeedRoute
   '/campanhas/$id': typeof CampanhasIdRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/influencers': typeof InfluencersRoute
   '/provas': typeof ProvasRoute
   '/relatorios': typeof RelatoriosRoute
+  '/api/seed': typeof ApiSeedRoute
   '/campanhas/$id': typeof CampanhasIdRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/influencers': typeof InfluencersRoute
   '/provas': typeof ProvasRoute
   '/relatorios': typeof RelatoriosRoute
+  '/api/seed': typeof ApiSeedRoute
   '/campanhas/$id': typeof CampanhasIdRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/influencers'
     | '/provas'
     | '/relatorios'
+    | '/api/seed'
     | '/campanhas/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/influencers'
     | '/provas'
     | '/relatorios'
+    | '/api/seed'
     | '/campanhas/$id'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/influencers'
     | '/provas'
     | '/relatorios'
+    | '/api/seed'
     | '/campanhas/$id'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   InfluencersRoute: typeof InfluencersRoute
   ProvasRoute: typeof ProvasRoute
   RelatoriosRoute: typeof RelatoriosRoute
+  ApiSeedRoute: typeof ApiSeedRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CampanhasIdRouteImport
       parentRoute: typeof CampanhasRoute
     }
+    '/api/seed': {
+      id: '/api/seed'
+      path: '/api/seed'
+      fullPath: '/api/seed'
+      preLoaderRoute: typeof ApiSeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -235,7 +255,18 @@ const rootRouteChildren: RootRouteChildren = {
   InfluencersRoute: InfluencersRoute,
   ProvasRoute: ProvasRoute,
   RelatoriosRoute: RelatoriosRoute,
+  ApiSeedRoute: ApiSeedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
