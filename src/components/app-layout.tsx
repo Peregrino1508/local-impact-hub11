@@ -21,7 +21,7 @@ import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 
-const nav = [
+const adminNav = [
   { to: "/", label: "Área de Trabalho", icon: LayoutDashboard, exact: true },
   { to: "/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/influencers", label: "Influencers", icon: Users },
@@ -30,6 +30,11 @@ const nav = [
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/provas", label: "Provas de Entrega", icon: ImageIcon },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
+];
+
+const influencerNav = [
+  { to: "/", label: "Meu Painel", icon: LayoutDashboard, exact: true },
+  { to: "/provas", label: "Minhas Provas", icon: ImageIcon },
 ];
 
 export function AppLayout({
@@ -48,7 +53,7 @@ export function AppLayout({
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  // Guard: redireciona para login se não autenticado (usando useEffect para evitar render-time navigate)
+  // Guard: redireciona para login se não autenticado
   useEffect(() => {
     if (!isAuthenticated) {
       navigate({ to: "/login" });
@@ -63,6 +68,8 @@ export function AppLayout({
   // Enquanto verifica autenticação, não renderiza nada
   if (!isAuthenticated) return null;
 
+  const nav = user?.role === "influencer" ? influencerNav : adminNav;
+
   return (
     <div className="min-h-screen flex bg-background text-foreground">
       {/* Sidebar */}
@@ -72,7 +79,7 @@ export function AppLayout({
             <MessageCircle className="size-5 text-primary-foreground" />
           </div>
           <div className="font-semibold text-lg leading-tight">
-            Projeto <span className="text-primary">Influencer</span>
+            Influence <span className="text-primary">Local</span>
           </div>
         </div>
 
@@ -100,15 +107,15 @@ export function AppLayout({
         <div className="p-3 border-t border-sidebar-border/60">
           <div className="rounded-xl bg-sidebar-accent p-4">
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <ShieldCheck className="size-4 text-primary" /> Plano Profissional
+              <ShieldCheck className="size-4 text-primary" />
+              {user?.role === "influencer" ? "Painel Influencer" : "Plano Profissional"}
             </div>
-            <p className="text-xs text-sidebar-foreground/70 mt-1">Sua assinatura é válida até 07/06/2026</p>
-            <button className="w-full mt-3 rounded-md border border-sidebar-border/60 py-1.5 text-xs font-medium hover:bg-sidebar/40">
-              Gerenciar Plano
-            </button>
+            <p className="text-xs text-sidebar-foreground/70 mt-1">
+              {user?.role === "influencer" ? "Conectado com sucesso" : "Sua assinatura é válida até 07/06/2026"}
+            </p>
           </div>
           <div className="text-[11px] text-sidebar-foreground/50 mt-3 px-1">
-            Projeto Influencer · © 2026
+            Influence Local · © 2026
           </div>
         </div>
       </aside>
@@ -121,23 +128,27 @@ export function AppLayout({
               <h1 className="text-xl font-bold">{title}</h1>
               {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
             </div>
-            <div className="flex-1 max-w-md mx-auto relative">
-              <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input
-                placeholder="Buscar campanhas, influencers, clientes..."
-                className="w-full pl-9 pr-12 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
-              />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘K</kbd>
-            </div>
-            <div className="flex items-center gap-3">
-              {actions ?? (
+            
+            {user?.role !== "influencer" && (
+              <div className="flex-1 max-w-md mx-auto relative">
+                <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  placeholder="Buscar campanhas, influencers, clientes..."
+                  className="w-full pl-9 pr-12 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+                />
+                <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘K</kbd>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 ml-auto">
+              {actions ?? (user?.role !== "influencer" && (
                 <Link
                   to="/campanhas"
                   className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:opacity-90"
                 >
                   <Plus className="size-4" /> Nova Campanha
                 </Link>
-              )}
+              ))}
               <button 
                 onClick={toggleTheme}
                 title="Alternar Tema"
@@ -145,15 +156,19 @@ export function AppLayout({
               >
                 {theme === "light" ? <Moon className="size-4" /> : <Sun className="size-4" />}
               </button>
-              <button className="relative size-10 rounded-lg border border-border flex items-center justify-center hover:bg-muted">
-                <Bell className="size-4" />
-                <span className="absolute -top-1 -right-1 size-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">3</span>
-              </button>
+              {user?.role !== "influencer" && (
+                <button className="relative size-10 rounded-lg border border-border flex items-center justify-center hover:bg-muted">
+                  <Bell className="size-4" />
+                  <span className="absolute -top-1 -right-1 size-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">3</span>
+                </button>
+              )}
               <div className="flex items-center gap-2 pl-2 border-l border-border">
                 <div className="size-10 rounded-full bg-gradient-to-br from-sidebar to-primary" />
                 <div className="text-sm leading-tight">
                   <div className="font-semibold">{user?.name ?? "Admin"}</div>
-                  <div className="text-xs text-muted-foreground">Super Admin</div>
+                  <div className="text-xs text-muted-foreground">
+                    {user?.role === "influencer" ? "Influencer" : "Super Admin"}
+                  </div>
                 </div>
               </div>
               <button
@@ -208,6 +223,9 @@ export function StatusBadge({ status }: { status: string }) {
     "Alta": "bg-primary/10 text-primary border-primary/20",
     "Média": "bg-warning/10 text-warning border-warning/20",
     "Baixa": "bg-destructive/10 text-destructive border-destructive/20",
+    "need_profile": "bg-warning/10 text-warning border-warning/20",
+    "pending_approval": "bg-info/10 text-info border-info/20",
+    "approved": "bg-primary/10 text-primary border-primary/20",
   };
   const cls = map[status] ?? "bg-muted text-muted-foreground border-border";
   return (

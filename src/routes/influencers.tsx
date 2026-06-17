@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout, Card, StatusBadge, Avatar } from "@/components/app-layout";
 import { influencers as initialInfluencers, proofs as initialProofs, clients as initialClients, fmtNum, type Influencer, type Client } from "@/lib/mock-data";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Check, X, ExternalLink, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { getConfig } from "./configuracoes";
+import { getRegisteredUsers, setInfluencerStatus } from "@/lib/auth";
 
 export const Route = createFileRoute("/influencers")({
   head: () => ({ meta: [{ title: "Influencers — Influence Local" }] }),
@@ -31,10 +33,46 @@ function InfluencersPage() {
 
   const [open, setOpen] = useState(false);
 
+  const [activeTab, setActiveTab] = useState<"ativas" | "solicitacoes">("ativas");
+  const [pendingUsers, setPendingUsers] = useState<any[]>([]);
+
+  const loadPendingUsers = () => {
+    const users = getRegisteredUsers();
+    setPendingUsers(users.filter(u => u.influencerStatus === "pending_approval"));
+  };
+
   // Toda vez que a variável 'data' mudar, salvamos no navegador
   useEffect(() => {
     localStorage.setItem("memoria_influencers", JSON.stringify(data));
+    loadPendingUsers();
   }, [data]);
+
+  const handleApprove = (email: string) => {
+    setInfluencerStatus(email, "approved");
+    
+    // Atualiza o status para "Ativo" ou "Ativa" na listagem
+    setData(prev => prev.map(inf => {
+      if (inf.email?.toLowerCase() === email.toLowerCase()) {
+        return { ...inf, status: "Ativa" };
+      }
+      return inf;
+    }));
+    
+    toast.success("Influencer aprovada com sucesso!");
+    loadPendingUsers();
+  };
+
+  const handleReject = (email: string) => {
+    if (!confirm("Tem certeza de que deseja recusar este cadastro?")) return;
+    setInfluencerStatus(email, "need_profile");
+    
+    // Remove do array de influencers
+    setData(prev => prev.filter(inf => inf.email?.toLowerCase() !== email.toLowerCase()));
+    
+    toast.error("Cadastro de influencer recusado.");
+    loadPendingUsers();
+  };
+
 
   function handleDelete(id: string) {
     if (!confirm("Tem certeza que deseja excluir esta influencer? Isso também apagará todas as provas de entrega dela.")) return;
@@ -72,10 +110,10 @@ function InfluencersPage() {
       instagram: formData.get("instagram") as string,
       niche: formData.get("niche") as string,
       divulgationDays: Number(formData.get("divulgationDays")),
-      avgViews: 0, // Removido do form, enviando 0 por padrão
-      cpmInternal: 20, // default
-      status: "Em teste",
-      reliability: "Média",
+      avgViews: 0,
+      cpmInternal: getConfig().cpmInterno, // usa configuração global
+      status: getConfig().statusPadraoNovaInfluencer,
+      reliability: getConfig().confiabilidadePadrao,
     };
 
     // Adiciona ao início do array global para persistir durante a navegação
@@ -177,36 +215,132 @@ function InfluencersPage() {
         </Dialog>
       }
     >
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs text-muted-foreground">
-              <tr>
-                {["Nome", "Cidade", "Bairro", "WhatsApp", "Em qual empresa", "Dias/Semana", "Status", "Confiabilidade", "Ações"].map(h => <th key={h} className="text-left font-medium px-4 py-3">{h}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map(i => (
-                <tr key={i.id} className="border-t border-border hover:bg-muted/30">
-                  <td className="px-4 py-3 flex items-center gap-2"><Avatar name={i.name} /> {i.name}</td>
-                  <td className="px-4 py-3">{i.city}</td>
-                  <td className="px-4 py-3">{i.neighborhood}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{i.whatsapp}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{i.niche}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{i.divulgationDays ? `${i.divulgationDays} dias` : "3 dias"}</td>
-                  <td className="px-4 py-3"><StatusBadge status={i.status} /></td>
-                  <td className="px-4 py-3"><StatusBadge status={i.reliability} /></td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => handleDelete(i.id)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Excluir Influencer">
-                      <Trash2 className="size-4" />
-                    </button>
-                  </td>
+      {/* Abas de Navegação */}
+      <div className="flex border-b border-border mb-6">
+        <button
+          onClick={() => setActiveTab("ativas")}
+          className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-all ${
+            activeTab === "ativas"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Influencers Ativas ({data.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("solicitacoes")}
+          className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-all ${
+            activeTab === "solicitacoes"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Solicitações Pendentes ({pendingUsers.length})
+        </button>
+      </div>
+
+      {activeTab === "ativas" ? (
+        <Card className="overflow-hidden animate-fadeIn">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-xs text-muted-foreground">
+                <tr>
+                  {["Nome", "Cidade", "Bairro", "WhatsApp", "Em qual empresa", "Dias/Semana", "Status", "Confiabilidade", "Ações"].map(h => <th key={h} className="text-left font-medium px-4 py-3">{h}</th>)}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              </thead>
+              <tbody>
+                {data.map(i => (
+                  <tr key={i.id} className="border-t border-border hover:bg-muted/30">
+                    <td className="px-4 py-3 flex items-center gap-2"><Avatar name={i.name} /> {i.name}</td>
+                    <td className="px-4 py-3">{i.city}</td>
+                    <td className="px-4 py-3">{i.neighborhood}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{i.whatsapp}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{i.niche}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{i.divulgationDays ? `${i.divulgationDays} dias` : "3 dias"}</td>
+                    <td className="px-4 py-3"><StatusBadge status={i.status} /></td>
+                    <td className="px-4 py-3"><StatusBadge status={i.reliability} /></td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => handleDelete(i.id)} className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors" title="Excluir Influencer">
+                        <Trash2 className="size-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {data.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className="text-center py-8 text-muted-foreground">Nenhuma influencer cadastrada no momento.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden animate-fadeIn">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-xs text-muted-foreground">
+                <tr>
+                  {["Nome Completo", "WhatsApp / Bairro", "Cidade / UF", "Empresa Escolhida", "Endereço", "Maps", "Ações"].map(h => <th key={h} className="text-left font-medium px-4 py-3">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {pendingUsers.map(u => (
+                  <tr key={u.email} className="border-t border-border hover:bg-muted/30">
+                    <td className="px-4 py-3 font-semibold">{u.influencerProfile?.fullName || u.name}</td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium">{u.influencerProfile?.whatsapp}</div>
+                      <div className="text-xs text-muted-foreground">{u.influencerProfile?.neighborhood}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div>{u.influencerProfile?.city}</div>
+                      <div className="text-xs text-muted-foreground">{u.influencerProfile?.state}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                        {u.influencerProfile?.niche || "Não informado"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground max-w-[200px] truncate" title={u.influencerProfile?.address}>
+                      {u.influencerProfile?.address} (CEP: {u.influencerProfile?.cep})
+                    </td>
+                    <td className="px-4 py-3">
+                      {u.influencerProfile?.googleMapsLink ? (
+                        <a href={u.influencerProfile?.googleMapsLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
+                          <MapPin className="size-4" /> Link <ExternalLink className="size-3" />
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleApprove(u.email)}
+                          className="inline-flex items-center gap-1 rounded bg-primary text-primary-foreground px-2.5 py-1 text-xs font-bold hover:opacity-90 transition-opacity"
+                        >
+                          <Check className="size-3.5" /> Aprovar
+                        </button>
+                        <button
+                          onClick={() => handleReject(u.email)}
+                          className="inline-flex items-center gap-1 rounded border border-destructive/20 text-destructive bg-destructive/5 px-2.5 py-1 text-xs font-bold hover:bg-destructive/10 transition-colors"
+                        >
+                          <X className="size-3.5" /> Recusar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {pendingUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="text-center py-12 text-muted-foreground">Nenhuma solicitação de cadastro pendente.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
     </AppLayout>
   );
 }

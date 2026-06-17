@@ -5,6 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { getConfig } from "./configuracoes";
 
 export const Route = createFileRoute("/clientes")({
   head: () => ({ meta: [{ title: "Clientes — Influence Local" }] }),
@@ -59,13 +60,16 @@ function ClientesPage() {
       segment: formData.get("segment") as string,
       campaigns: 0,
       totalInvested: 0,
-      status: "Ativo"
+      status: getConfig().statusPadraoNovoCliente,
     };
 
+    const cfg = getConfig();
     initialClients.unshift(newClient);
     setData([newClient, ...data]);
     setOpen(false);
-    toast.success("Empresa cadastrada com sucesso!");
+    if (cfg.notificarNovoCadastro) {
+      toast.success(`🏢 Novo cliente cadastrado: ${newClient.company}`);
+    }
   }
 
   return (

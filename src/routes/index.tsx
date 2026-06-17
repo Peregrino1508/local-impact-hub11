@@ -21,7 +21,19 @@ import {
   CheckCircle2,
   Clock,
   Tag,
+  UploadCloud,
+  AlertCircle,
+  Sparkles,
+  MapPin,
+  Send,
+  HelpCircle,
+  PhoneCall,
+  Calendar,
+  LogOut,
 } from "lucide-react";
+import { getConfig } from "./configuracoes";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -95,6 +107,440 @@ function Dashboard() {
     }
   }, []);
 
+  // ── Fluxo do Influencer ───────────────────────────────────────────────────
+  const { user, saveProfile, logout, refreshSession } = useAuth();
+
+  const [fullName, setFullName] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [whatsappVal, setWhatsappVal] = useState("");
+  const [addressVal, setAddressVal] = useState("");
+  const [cepVal, setCepVal] = useState("");
+  const [cityVal, setCityVal] = useState("");
+  const [stateVal, setStateVal] = useState("");
+  const [neighborhoodVal, setNeighborhoodVal] = useState("");
+  const [googleMapsVal, setGoogleMapsVal] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("");
+
+  // Envio de prova pelo influencer
+  const [proofCampaignId, setProofCampaignId] = useState("");
+  const [proofType, setProofType] = useState("Print das visualizações");
+  const [proofViews, setProofViews] = useState("");
+  const [proofTime, setProofTime] = useState("");
+  const [proofDate, setProofDate] = useState(new Date().toISOString().split("T")[0]);
+  const [directCall, setDirectCall] = useState("Não");
+  const [directCallDetails, setDirectCallDetails] = useState("");
+
+  if (user?.role === "influencer") {
+    // 1. Cadastro pendente (need_profile)
+    if (user.influencerStatus === "need_profile") {
+      const handleRegisterProfile = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!fullName.trim() || !whatsappVal.trim() || !addressVal.trim() || !cepVal.trim() || !cityVal.trim() || !stateVal.trim() || !neighborhoodVal.trim() || !selectedCompany) {
+          toast.error("Por favor, preencha todos os campos obrigatórios.");
+          return;
+        }
+
+        const profile = {
+          fullName,
+          nickname,
+          whatsapp: whatsappVal,
+          address: addressVal,
+          cep: cepVal,
+          city: cityVal,
+          state: stateVal,
+          neighborhood: neighborhoodVal,
+          googleMapsLink: googleMapsVal,
+        };
+
+        saveProfile(profile);
+
+        // Cria a influencer correspondente no painel admin
+        const cpm = getConfig().cpmInterno || 20;
+        const newInf = {
+          id: "inf_" + Date.now(),
+          name: fullName,
+          publicName: nickname || fullName,
+          city: cityVal,
+          neighborhood: neighborhoodVal,
+          whatsapp: whatsappVal,
+          instagram: "Status de Whatsapp",
+          niche: selectedCompany,
+          divulgationDays: 3,
+          avgViews: 0,
+          cpmInternal: cpm,
+          status: "Pendente de aprovação",
+          reliability: "Média",
+          address: addressVal,
+          cep: cepVal,
+          state: stateVal,
+          googleMapsLink: googleMapsVal,
+          email: user.email,
+        };
+
+        const currentInfs = [...influencers];
+        currentInfs.unshift(newInf);
+        setInfluencers(currentInfs);
+        localStorage.setItem("memoria_influencers", JSON.stringify(currentInfs));
+
+        // Cria prova zerada padrão para iniciar
+        const newProof = {
+          id: "p" + Date.now(),
+          influencerId: newInf.id,
+          campaignId: "",
+          type: "Print das visualizações",
+          publishedAt: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+          collectedAt: "—",
+          views: 0,
+          imageUrl: "",
+          status: "Pendente",
+        };
+        const currentProofs = [...proofs];
+        currentProofs.unshift(newProof);
+        setProofs(currentProofs);
+        localStorage.setItem("memoria_provas", JSON.stringify(currentProofs));
+
+        toast.success("Cadastro de influencer enviado para aprovação!");
+        refreshSession();
+      };
+
+      return (
+        <div className="min-h-screen bg-background p-6 flex items-center justify-center">
+          <Card className="w-full max-w-2xl p-8 border-2 border-border shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4">
+              <button onClick={logout} className="text-sm text-muted-foreground hover:text-destructive flex items-center gap-1.5">
+                <LogOut className="size-4" /> Sair
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <Sparkles className="size-6 animate-pulse" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">Cadastrar como Influencer</h1>
+                <p className="text-sm text-muted-foreground">Preencha suas informações para começar a divulgar e lucrar.</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleRegisterProfile} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">Nome Completo *</label>
+                  <input required type="text" value={fullName} onChange={e => setFullName(e.target.value)}
+                    placeholder="Ex: Ana Clara Souza" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">Apelido (Nome Artístico)</label>
+                  <input type="text" value={nickname} onChange={e => setNickname(e.target.value)}
+                    placeholder="Ex: Aninha" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">WhatsApp (com DDD) *</label>
+                  <input required type="text" value={whatsappVal} onChange={e => setWhatsappVal(e.target.value)}
+                    placeholder="Ex: (11) 98765-4321" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">Qual empresa quer trabalhar? *</label>
+                  <select required value={selectedCompany} onChange={e => setSelectedCompany(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                    <option value="">Selecione uma empresa...</option>
+                    {clients.map(c => <option key={c.id} value={c.company}>{c.company}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">CEP *</label>
+                  <input required type="text" value={cepVal} onChange={e => setCepVal(e.target.value)}
+                    placeholder="Ex: 01001-000" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">Bairro *</label>
+                  <input required type="text" value={neighborhoodVal} onChange={e => setNeighborhoodVal(e.target.value)}
+                    placeholder="Ex: Pinheiros" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">Cidade *</label>
+                  <input required type="text" value={cityVal} onChange={e => setCityVal(e.target.value)}
+                    placeholder="Ex: São Paulo" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold">Estado *</label>
+                  <input required type="text" value={stateVal} onChange={e => setStateVal(e.target.value)}
+                    placeholder="Ex: SP" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="col-span-full space-y-1.5">
+                  <label className="text-sm font-semibold">Endereço Completo (Rua, Número, Comp.) *</label>
+                  <input required type="text" value={addressVal} onChange={e => setAddressVal(e.target.value)}
+                    placeholder="Ex: Av. Paulista, 1000 - Apto 12" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                </div>
+                <div className="col-span-full space-y-1.5">
+                  <label className="text-sm font-semibold">Link de Localização do Google Maps</label>
+                  <div className="relative">
+                    <MapPin className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input type="url" value={googleMapsVal} onChange={e => setGoogleMapsVal(e.target.value)}
+                      placeholder="Cole o link do Google Maps da sua localização" className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">* Campos obrigatórios</span>
+                <button type="submit" className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+                  <Send className="size-4" /> Cadastrar como Influencer
+                </button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      );
+    }
+
+    // 2. Aguardando aprovação (pending_approval)
+    if (user.influencerStatus === "pending_approval") {
+      return (
+        <div className="min-h-screen bg-background p-6 flex items-center justify-center">
+          <Card className="w-full max-w-md p-8 border-2 border-border text-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4">
+              <button onClick={logout} className="text-sm text-muted-foreground hover:text-destructive flex items-center gap-1.5">
+                <LogOut className="size-4" /> Sair
+              </button>
+            </div>
+            <div className="size-20 rounded-full bg-warning/10 text-warning flex items-center justify-center mx-auto mb-6 animate-pulse">
+              <Clock className="size-10" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Cadastro em Análise</h1>
+            <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
+              Olá, <strong className="text-foreground">{user.name}</strong>. Seu cadastro de influencer foi enviado com sucesso e está na fila para aprovação.
+            </p>
+            <div className="bg-muted/40 p-4 rounded-xl border border-border my-6 text-xs text-left space-y-2">
+              <div className="font-semibold text-muted-foreground text-[10px] uppercase">Detalhes da solicitação:</div>
+              <div><strong>Nome:</strong> {user.influencerProfile?.fullName}</div>
+              <div><strong>WhatsApp:</strong> {user.influencerProfile?.whatsapp}</div>
+              <div><strong>Bairro:</strong> {user.influencerProfile?.neighborhood}</div>
+              <div><strong>Status:</strong> <span className="text-warning font-semibold">Aguardando aprovação do administrador</span></div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Você receberá acesso total ao painel assim que um administrador aprovar sua conta. Obrigado pela paciência!
+            </p>
+          </Card>
+        </div>
+      );
+    }
+
+    // 3. Painel do Influencer Completo (approved)
+    if (user.influencerStatus === "approved") {
+      // Localiza a influencer nos dados locais
+      const myInf = influencers.find(i => i.email?.toLowerCase() === user.email?.toLowerCase() || i.name?.toLowerCase() === user.name?.toLowerCase()) || influencers[0];
+      const myProofs = proofs.filter(p => p.influencerId === myInf?.id);
+
+      // Métricas financeiras
+      const cpmInterno = getConfig().cpmInterno || 20;
+      const totalViewsEntregues = myProofs.filter(p => p.status === "Aprovada").reduce((s, p) => s + (p.views || 0), 0);
+      const totalPago = myProofs.filter(p => p.paymentStatus === "Pago").reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
+      const totalProcessando = myProofs.filter(p => p.paymentStatus === "Processando").reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
+      const totalALiberar = myProofs.filter(p => p.status === "Aprovada" && p.paymentStatus === "Liberado").reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
+
+      const handleAddProof = (e: React.FormEvent) => {
+        e.preventDefault();
+        const viewsNum = Number(proofViews);
+        if (!proofCampaignId) {
+          toast.error("Por favor, selecione uma campanha.");
+          return;
+        }
+        if (viewsNum <= 0) {
+          toast.error("Insira o número de visualizações.");
+          return;
+        }
+
+        const valor = (viewsNum * cpmInterno) / 1000;
+        const newProof: ProofEntry = {
+          id: "p" + Date.now(),
+          influencerId: myInf.id,
+          campaignId: proofCampaignId,
+          type: proofType as any,
+          publishedAt: proofTime || new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+          collectedAt: "—",
+          views: viewsNum,
+          imageUrl: "",
+          status: "Pendente",
+          date: proofDate,
+          valorCalculado: valor,
+          paymentStatus: "Pendente",
+          directCall: directCall === "Sim",
+          directCallDetails: directCallDetails,
+        };
+
+        const updated = [newProof, ...proofs];
+        setProofs(updated);
+        localStorage.setItem("memoria_provas", JSON.stringify(updated));
+
+        toast.success("Prova de entrega enviada com sucesso para análise!");
+        setProofViews("");
+        setProofTime("");
+        setDirectCall("Não");
+        setDirectCallDetails("");
+      };
+
+      // Cupom de afiliado
+      const couponCode = `CUPOM-${user.name.toUpperCase().replace(/\s/g, "")}`;
+
+      return (
+        <AppLayout title="Meu Painel Influencer" subtitle="Suba suas métricas diárias e acompanhe seus ganhos">
+          {/* Alerta de Cupom / Afiliado */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+            <Card className="p-5 border-l-4 border-l-primary flex gap-4 col-span-full items-center bg-primary/5">
+              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <Tag className="size-6 animate-pulse" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+                  🔥 Programa de Afiliados <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px]">Ativo</span>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Ganhe <strong className="text-foreground">3% de comissão</strong> sobre as contratações de clientes que utilizarem seu cupom exclusivo:
+                </p>
+                <div className="flex items-center gap-3 mt-3">
+                  <span className="bg-card px-3 py-1.5 rounded-lg border border-border font-mono text-sm font-bold text-primary tracking-wider">{couponCode}</span>
+                  <button onClick={() => { navigator.clipboard.writeText(couponCode); toast.success("Cupom copiado!"); }} className="text-xs text-primary font-semibold hover:underline">Copiar Cupom</button>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Métricas do Influencer */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {[
+              { label: "Views Aprovadas", value: fmtNum(totalViewsEntregues), icon: Eye, color: "text-info" },
+              { label: "A Liberar", value: fmtBRL(totalALiberar), icon: DollarSign, color: "text-primary" },
+              { label: "Processando", value: fmtBRL(totalProcessando), icon: Clock, color: "text-orange-400" },
+              { label: "Pago", value: fmtBRL(totalPago), icon: CheckCircle2, color: "text-green-400" },
+            ].map(m => (
+              <Card key={m.label} className="p-4 flex items-center gap-3">
+                <div className="size-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
+                  <m.icon className="size-5" />
+                </div>
+                <div>
+                  <div className="text-[11px] text-muted-foreground">{m.label}</div>
+                  <div className={`text-xl font-bold ${m.color}`}>{m.value}</div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Form de Envio */}
+            <Card className="p-6">
+              <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
+                <UploadCloud className="size-5 text-primary" /> Enviar Nova Métrica Diária
+              </h2>
+              <form onSubmit={handleAddProof} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5 col-span-2">
+                    <label className="text-xs font-semibold">Campanha vinculada *</label>
+                    <select required value={proofCampaignId} onChange={e => setProofCampaignId(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                      <option value="">Selecione a campanha/empresa...</option>
+                      {campaigns.map(c => <option key={c.id} value={c.id}>{c.name || c.nome}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold">Tipo de Prova *</label>
+                    <select required value={proofType} onChange={e => setProofType(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                      <option value="Print das visualizações">Print das visualizações (Status)</option>
+                      <option value="Print da postagem">Print da postagem</option>
+                      <option value="Gravação de tela">Gravação de tela</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold">Visualizações no Status *</label>
+                    <input required type="number" min={0} value={proofViews} onChange={e => setProofViews(e.target.value)}
+                      placeholder="Ex: 1200" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold">Data da Publicação *</label>
+                    <input required type="date" value={proofDate} onChange={e => setProofDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold">Hora da Publicação *</label>
+                    <input required type="text" placeholder="Ex: 08:30" value={proofTime} onChange={e => setProofTime(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  </div>
+                  <div className="space-y-1.5 col-span-2 border-t border-border/60 pt-3">
+                    <label className="text-xs font-semibold flex items-center gap-1.5">
+                      <PhoneCall className="size-3.5 text-primary animate-bounce" /> Chamada Direta no WhatsApp?
+                    </label>
+                    <select value={directCall} onChange={e => setDirectCall(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                      <option value="Não">Não houve chamada direta</option>
+                      <option value="Sim">Sim, houve contatos</option>
+                    </select>
+                  </div>
+                  {directCall === "Sim" && (
+                    <div className="space-y-1.5 col-span-2 animate-fadeIn">
+                      <label className="text-xs font-semibold">Detalhes e nome dos clientes que chamaram *</label>
+                      <textarea required value={directCallDetails} onChange={e => setDirectCallDetails(e.target.value)}
+                        placeholder="Ex: Cliente Marcos chamou pedindo orçamentos da pizza." rows={2}
+                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-muted/30 border border-border p-3 rounded-lg text-xs text-muted-foreground">
+                  Ganhos calculados a <strong className="text-foreground">R$ {cpmInterno} por 1.000 views</strong> (CPM Interno configurado pelo administrador).
+                </div>
+
+                <button type="submit" className="w-full py-2.5 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                  Enviar Métrica Diária
+                </button>
+              </form>
+            </Card>
+
+            {/* Extrato de Provas */}
+            <Card className="p-6 flex flex-col">
+              <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
+                <Calendar className="size-5 text-primary" /> Histórico de Envios
+              </h2>
+              <div className="overflow-x-auto flex-1">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-muted/40 text-xs text-muted-foreground">
+                    <tr>
+                      <th className="px-3 py-2 font-medium">Data</th>
+                      <th className="px-3 py-2 font-medium">Views</th>
+                      <th className="px-3 py-2 font-medium">Chamada</th>
+                      <th className="px-3 py-2 font-medium">Valor</th>
+                      <th className="px-3 py-2 font-medium">Métrica</th>
+                      <th className="px-3 py-2 font-medium">Pagamento</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myProofs.map(p => {
+                      const c = campaigns.find(x => x.id === p.campaignId);
+                      return (
+                        <tr key={p.id} className="border-t border-border hover:bg-muted/10">
+                          <td className="px-3 py-2 text-xs">{p.date || "—"}</td>
+                          <td className="px-3 py-2 font-semibold">{fmtNum(p.views)}</td>
+                          <td className="px-3 py-2 text-xs truncate max-w-[100px]">{p.directCall ? "Sim" : "Não"}</td>
+                          <td className="px-3 py-2 font-bold text-primary">{fmtBRL(p.valorCalculado ?? 0)}</td>
+                          <td className="px-3 py-2"><StatusBadge status={p.status} /></td>
+                          <td className="px-3 py-2"><StatusBadge status={p.paymentStatus || "Pendente"} /></td>
+                        </tr>
+                      );
+                    })}
+                    {myProofs.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="text-center py-8 text-muted-foreground text-xs">Nenhum envio registrado ainda.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        </AppLayout>
+      );
+    }
+  }
+
   // ── Filtro de análise ─────────────────────────────────────────────────────
   const [filterClientId, setFilterClientId] = useState("");
   const [filterInfluencerId, setFilterInfluencerId] = useState("");
@@ -121,6 +567,10 @@ function Dashboard() {
   const selectedClient = clients.find((cl: any) => cl.id === filterClientId);
   const selectedInfluencer = influencers.find((i: any) => i.id === filterInfluencerId);
 
+  // ── Configurações globais injetadas nos cálculos ─────────────────────────
+  const sysConfig = getConfig();
+  const cpmPadrao = sysConfig.cpmInterno || 20;
+
   // Métricas do par filtrado
   const filterStats = (() => {
     let totalViews = 0, totalPaid = 0, totalRevenue = 0;
@@ -131,7 +581,7 @@ function Dashboard() {
       (camp.campaign_influencers || []).forEach((ci: any) => {
         if (!filterInfluencerId || ci.influencer_id === filterInfluencerId) {
           totalViews += ci.views_delivered || 0;
-          totalPaid += calcInternalCost(ci.views_delivered || 0, camp.cpm_internal || 20);
+          totalPaid += calcInternalCost(ci.views_delivered || 0, camp.cpm_internal || cpmPadrao);
           if (ci.proof_status === "Aprovada") approved++;
           else pending++;
         }
@@ -151,7 +601,7 @@ function Dashboard() {
     .reduce((s: number, c: any) => s + (c.client_price || 0), 0);
   const internalCost = campaigns.reduce((s: number, c: any) => {
     const ciCost = (c.campaign_influencers || []).reduce(
-      (sum: number, ci: any) => sum + calcInternalCost(ci.views_delivered || 0, c.cpm_internal || 20),
+      (sum: number, ci: any) => sum + calcInternalCost(ci.views_delivered || 0, c.cpm_internal || cpmPadrao),
       0
     );
     return s + ciCost;

@@ -1,24 +1,29 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { MessageCircle, Eye, EyeOff, ShieldCheck, Loader2 } from "lucide-react";
+import { MessageCircle, Eye, EyeOff, ShieldCheck, Loader2, UserPlus, LogIn } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Login — Projeto Influencer" },
-      { name: "description", content: "Acesso ao painel administrativo do Projeto Influencer." },
+      { title: "Acesso — Influence Local" },
+      { name: "description", content: "Acesso ao painel administrativo e do influencer." },
     ],
   }),
   component: LoginPage,
 });
 
 function LoginPage() {
-  const { login, isAuthenticated } = useAuth();
+  const { login, registerUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  // Estados do formulário
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,15 +44,49 @@ function LoginPage() {
     // Simula pequeno delay para UX
     await new Promise((r) => setTimeout(r, 700));
 
-    const result = login(email, password);
-    setLoading(false);
+    if (isRegisterMode) {
+      // Validações de cadastro
+      if (!name.trim()) {
+        setError("O nome é obrigatório.");
+        setLoading(false);
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError("As senhas não coincidem.");
+        setLoading(false);
+        return;
+      }
+      if (password.length < 6) {
+        setError("A senha deve ter pelo menos 6 caracteres.");
+        setLoading(false);
+        return;
+      }
 
-    if (result.success) {
-      navigate({ to: "/" });
+      const result = registerUser(email, password, name);
+      setLoading(false);
+
+      if (result.success) {
+        toast.success("Conta criada! Agora preencha seu cadastro de influencer após logar.");
+        setIsRegisterMode(false);
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        setError(result.error ?? "Erro ao criar conta.");
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+      }
     } else {
-      setError(result.error ?? "Credenciais inválidas.");
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
+      // Login
+      const result = login(email, password);
+      setLoading(false);
+
+      if (result.success) {
+        navigate({ to: "/" });
+      } else {
+        setError(result.error ?? "Credenciais inválidas.");
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+      }
     }
   }
 
@@ -70,11 +109,11 @@ function LoginPage() {
             <MessageCircle className="size-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold mb-4 leading-tight">
-            Projeto<br />
-            <span className="text-white/80">Influencer</span>
+            Influence<br />
+            <span className="text-white/80">Local</span>
           </h1>
           <p className="text-white/70 text-lg leading-relaxed">
-            Gerencie campanhas de WhatsApp Status com influencers locais de forma simples e eficiente.
+            Plataforma para gestão de campanhas de WhatsApp Status com influencers locais.
           </p>
 
           <div className="mt-12 grid grid-cols-3 gap-4">
@@ -101,7 +140,7 @@ function LoginPage() {
               <MessageCircle className="size-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl">
-              Projeto <span className="text-primary">Influencer</span>
+              Influence <span className="text-primary">Local</span>
             </span>
           </div>
 
@@ -109,11 +148,15 @@ function LoginPage() {
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-4">
               <ShieldCheck className="size-3.5" />
-              Acesso Super Admin
+              {isRegisterMode ? "Cadastro de Influencer" : "Acesso à Plataforma"}
             </div>
-            <h2 className="text-3xl font-bold text-foreground">Bem-vindo de volta</h2>
+            <h2 className="text-3xl font-bold text-foreground">
+              {isRegisterMode ? "Crie sua conta" : "Bem-vindo de volta"}
+            </h2>
             <p className="text-muted-foreground mt-2">
-              Entre com suas credenciais para acessar o painel.
+              {isRegisterMode
+                ? "Cadastre seu login primeiro para ter acesso à nossa rede."
+                : "Entre com suas credenciais para acessar o painel."}
             </p>
           </div>
 
@@ -122,6 +165,24 @@ function LoginPage() {
             onSubmit={handleSubmit}
             className={`space-y-5 transition-all ${shake ? "animate-shake" : ""}`}
           >
+            {/* Nome Completo (Modo Cadastro) */}
+            {isRegisterMode && (
+              <div className="space-y-1.5 animate-fadeIn">
+                <label htmlFor="reg-name" className="text-sm font-medium text-foreground">
+                  Nome Completo
+                </label>
+                <input
+                  id="reg-name"
+                  type="text"
+                  required
+                  placeholder="Seu nome completo"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                />
+              </div>
+            )}
+
             {/* E-mail */}
             <div className="space-y-1.5">
               <label htmlFor="login-email" className="text-sm font-medium text-foreground">
@@ -148,7 +209,7 @@ function LoginPage() {
                 <input
                   id="login-password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
+                  autoComplete={isRegisterMode ? "new-password" : "current-password"}
                   required
                   placeholder="••••••••••••"
                   value={password}
@@ -166,6 +227,24 @@ function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {/* Confirmar Senha (Modo Cadastro) */}
+            {isRegisterMode && (
+              <div className="space-y-1.5 animate-fadeIn">
+                <label htmlFor="reg-confirm-password" className="text-sm font-medium text-foreground">
+                  Confirmar Senha
+                </label>
+                <input
+                  id="reg-confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="••••••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                />
+              </div>
+            )}
 
             {/* Erro */}
             {error && (
@@ -185,17 +264,39 @@ function LoginPage() {
               {loading ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Entrando...
+                  {isRegisterMode ? "Criando Conta..." : "Entrando..."}
+                </>
+              ) : isRegisterMode ? (
+                <>
+                  <UserPlus className="size-4" />
+                  Criar Conta
                 </>
               ) : (
-                "Entrar no Painel"
+                <>
+                  <LogIn className="size-4" />
+                  Entrar no Painel
+                </>
               )}
             </button>
           </form>
 
+          {/* Toggle entre Login e Cadastro */}
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsRegisterMode(!isRegisterMode);
+                setError("");
+              }}
+              className="text-sm text-primary hover:underline font-semibold"
+            >
+              {isRegisterMode ? "Já tenho uma conta? Faça Login" : "Não tem conta? Cadastrar-se como Influencer"}
+            </button>
+          </div>
+
           {/* Rodapé */}
           <p className="mt-10 text-center text-xs text-muted-foreground">
-            Projeto Influencer · © 2026 · Acesso restrito
+            Influence Local · © 2026 · Acesso restrito
           </p>
         </div>
       </div>
