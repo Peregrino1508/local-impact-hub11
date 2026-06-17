@@ -288,21 +288,34 @@ function Config() {
         </Card>
       </div>
 
-      {/* Botão Salvar */}
+      {/* Botões Finais */}
       <div className="flex items-center justify-between mt-6 pt-5 border-t border-border">
         <p className="text-xs text-muted-foreground">
           As configurações ficam salvas no seu navegador até a integração com o banco de dados.
         </p>
-        <button
-          onClick={handleSave}
-          className={`inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold transition-all ${
-            saved
-              ? "bg-green-600 text-white"
-              : "bg-primary text-primary-foreground hover:opacity-90"
-          }`}
-        >
-          {saved ? <><CheckCircle className="size-4" /> Configurações salvas!</> : "Salvar configurações"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              if (confirm("Tem certeza? Isso apagará todos os dados criados no seu navegador e voltará o sistema para os dados padrões (Mocks).")) {
+                localStorage.clear();
+                window.location.reload();
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-lg border border-destructive/30 px-4 py-2.5 text-sm font-semibold text-destructive hover:bg-destructive/10 transition-colors"
+          >
+            Limpar Dados Locais (Reset)
+          </button>
+          <button
+            onClick={handleSave}
+            className={`inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold transition-all ${
+              saved
+                ? "bg-green-600 text-white"
+                : "bg-primary text-primary-foreground hover:opacity-90"
+            }`}
+          >
+            {saved ? <><CheckCircle className="size-4" /> Configurações salvas!</> : "Salvar configurações"}
+          </button>
+        </div>
       </div>
     </AppLayout>
   );
