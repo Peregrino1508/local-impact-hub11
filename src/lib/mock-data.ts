@@ -82,6 +82,7 @@ export const clients: Client[] = [
   { id: "c1", responsible: "Carla Mendes", company: "Bella Moda", whatsapp: "(11) 98888-1111", email: "carla@bellamoda.com", city: "São Paulo", segment: "Moda feminina", campaigns: 6, totalInvested: 2400, status: "Ativo" },
   { id: "c2", responsible: "Rafael Costa", company: "Império Burger", whatsapp: "(11) 97777-2222", email: "rafael@imperioburger.com", city: "Guarulhos", segment: "Hamburgueria", campaigns: 4, totalInvested: 1800, status: "Ativo" },
   { id: "c3", responsible: "Fernanda Alves", company: "Studio Glam", whatsapp: "(11) 96666-3333", email: "fer@studioglam.com", city: "Osasco", segment: "Beleza", campaigns: 3, totalInvested: 1500, status: "Ativo" },
+  { id: "c4", responsible: "Diretor", company: "Galeão Óticas", whatsapp: "(11) 95555-4444", email: "contato@galeaooticas.com", city: "São Paulo", segment: "Óticas", campaigns: 0, totalInvested: 0, status: "Ativo" },
 ];
 
 export const influencers: Influencer[] = [
@@ -89,6 +90,8 @@ export const influencers: Influencer[] = [
   { id: "i2", name: "Maria Lima", publicName: "@marialima", whatsapp: "(11) 99000-2222", instagram: "@marialima", city: "São Paulo", neighborhood: "Jardim Norte", niche: "Beleza", avgViews: 820, cpmInternal: 20, status: "Ativa", reliability: "Alta", lastCampaign: "Bella Moda" },
   { id: "i3", name: "Luana Reis", publicName: "@luanareis", whatsapp: "(11) 99000-3333", instagram: "@luanareis", city: "São Paulo", neighborhood: "Vila Nova", niche: "Lifestyle local", avgViews: 1200, cpmInternal: 20, status: "Ativa", reliability: "Média", lastCampaign: "Bella Moda" },
   { id: "i4", name: "Camila Rocha", publicName: "@camilarocha", whatsapp: "(11) 99000-4444", instagram: "@camilarocha", city: "São Paulo", neighborhood: "Centro", niche: "Promoções locais", avgViews: 300, cpmInternal: 20, status: "Em teste", reliability: "Média", lastCampaign: "Bella Moda" },
+  { id: "i5", name: "Ivina Bruna de Sa", publicName: "@ivina.bruna", whatsapp: "(11) 99000-5555", instagram: "@ivina.bruna", city: "São Paulo", neighborhood: "Zona Leste", niche: "Galeão Óticas", avgViews: 1500, cpmInternal: 20, status: "Ativa", reliability: "Alta", lastCampaign: "Galeão Óticas" },
+  { id: "i6", name: "Susan Soares", publicName: "@susan.soares", whatsapp: "(11) 99000-6666", instagram: "@susan.soares", city: "São Paulo", neighborhood: "Zona Oeste", niche: "Galeão Óticas", avgViews: 2000, cpmInternal: 20, status: "Ativa", reliability: "Alta", lastCampaign: "Galeão Óticas" },
 ];
 
 export const campaigns: Campaign[] = [
