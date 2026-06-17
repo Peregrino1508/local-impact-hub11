@@ -4,6 +4,7 @@ import {
   proofs as initialProofs,
   influencers as initialInfluencers,
   campaigns as initialCampaigns,
+  clients as initialClients,
   fmtNum,
   type Proof,
 } from "@/lib/mock-data";
@@ -55,6 +56,14 @@ function ProvasPage() {
       if (s) return JSON.parse(s);
     }
     return initialCampaigns;
+  });
+
+  const [clients] = useState(() => {
+    if (typeof window !== "undefined") {
+      const s = localStorage.getItem("memoria_clientes");
+      if (s) return JSON.parse(s);
+    }
+    return initialClients;
   });
 
   const [data, setData] = useState<ProofEntry[]>(() => {
@@ -269,6 +278,8 @@ function ProvasPage() {
         {filtered.map(p => {
           const inf = influencers.find((i: any) => i.id === p.influencerId);
           const camp = campanhas.find((c: any) => c.id === p.campaignId);
+          const cl = clients.find((c: any) => c.id === p.campaignId || c.company === p.campaignId);
+          const campaignDisplayName = camp ? (camp.name || camp.nome) : (cl ? `${cl.company} (Geral)` : "Sem campanha");
           if (!inf) return null;
 
           const cpm = getConfig().cpmInterno;
@@ -289,7 +300,7 @@ function ProvasPage() {
                   <div>
                     <div className="font-semibold">{inf.name}</div>
                     <div className="text-xs text-muted-foreground truncate max-w-[160px]">
-                      {camp?.name || camp?.nome || "Sem campanha vinculada"}
+                      {campaignDisplayName}
                     </div>
                   </div>
                   <StatusBadge status={p.status} />

@@ -23,13 +23,16 @@ function InfluencersPage() {
     return initialInfluencers;
   });
   
-  const [clientOptions] = useState<Client[]>(() => {
+  const [clientOptions, setClientOptions] = useState<Client[]>(initialClients);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("memoria_clientes");
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        setClientOptions(JSON.parse(saved));
+      }
     }
-    return initialClients;
-  });
+  }, []);
 
   const [open, setOpen] = useState(false);
 

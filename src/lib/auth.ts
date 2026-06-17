@@ -193,6 +193,32 @@ export function setInfluencerStatus(email: string, status: "need_profile" | "pen
   return false;
 }
 
+// ─── Atualizar Empresa da Influencer (pelo admin) ─────────────────────────────
+export function adminUpdateInfluencerNiche(email: string, niche: string): boolean {
+  if (!isBrowser) return false;
+  const emailNorm = email.trim().toLowerCase();
+  const users = getRegisteredUsers();
+  const index = users.findIndex(u => u.email.toLowerCase() === emailNorm);
+  
+  if (index > -1 && users[index].influencerProfile) {
+    // Atualiza apenas a empresa/niche
+    users[index].influencerProfile!.niche = niche;
+    saveRegisteredUsers(users);
+
+    // Se o usuário estiver logado atualmente, atualiza a sessão dele também
+    const sessionRaw = localStorage.getItem(SESSION_KEY);
+    if (sessionRaw) {
+      const session: AuthSession = JSON.parse(sessionRaw);
+      if (session.user.email.toLowerCase() === emailNorm && session.user.influencerProfile) {
+        session.user.influencerProfile.niche = niche;
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
 // ─── Logout ───────────────────────────────────────────────────────────────────
 export function logout(): void {
   if (!isBrowser) return;

@@ -16,6 +16,7 @@ import {
   LogOut,
   Moon,
   Sun,
+  ClipboardList,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,12 +26,14 @@ const adminNav = [
   { to: "/", label: "Área de Trabalho", icon: LayoutDashboard, exact: true },
   { to: "/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/influencers", label: "Influencers", icon: Users },
+  { to: "/cadastros", label: "Cadastros Influencers", icon: ClipboardList },
   { to: "/clientes", label: "Clientes", icon: Briefcase },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/provas", label: "Provas de Entrega", icon: ImageIcon },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
+
 
 const influencerNav = [
   { to: "/", label: "Meu Painel", icon: LayoutDashboard, exact: true },

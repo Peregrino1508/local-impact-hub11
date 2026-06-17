@@ -438,7 +438,21 @@ function Dashboard() {
                     <select required value={proofCampaignId} onChange={e => setProofCampaignId(e.target.value)}
                       className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
                       <option value="">Selecione a campanha/empresa...</option>
-                      {campaigns.map(c => <option key={c.id} value={c.id}>{c.name || c.nome}</option>)}
+                      {campaigns.length > 0 && (
+                        <optgroup label="Campanhas Ativas">
+                          {campaigns.map(c => {
+                            const companyName = c.client?.company || clients.find(cl => cl.id === c.client_id)?.company || "Sem Empresa";
+                            return <option key={c.id} value={c.id}>{companyName} — {c.name || c.nome}</option>;
+                          })}
+                        </optgroup>
+                      )}
+                      {clients.length > 0 && (
+                        <optgroup label="Empresas (Divulgação Geral)">
+                          {clients.map(cl => (
+                            <option key={cl.id} value={cl.id}>{cl.company} (Geral)</option>
+                          ))}
+                        </optgroup>
+                      )}
                     </select>
                   </div>
                   <div className="space-y-1.5">
@@ -505,6 +519,7 @@ function Dashboard() {
                   <thead className="bg-muted/40 text-xs text-muted-foreground">
                     <tr>
                       <th className="px-3 py-2 font-medium">Data</th>
+                      <th className="px-3 py-2 font-medium">Campanha/Empresa</th>
                       <th className="px-3 py-2 font-medium">Views</th>
                       <th className="px-3 py-2 font-medium">Chamada</th>
                       <th className="px-3 py-2 font-medium">Valor</th>
@@ -515,9 +530,12 @@ function Dashboard() {
                   <tbody>
                     {myProofs.map(p => {
                       const c = campaigns.find(x => x.id === p.campaignId);
+                      const cl = clients.find(x => x.id === p.campaignId || x.company === p.campaignId);
+                      const campaignDisplayName = c ? (c.name || c.nome) : (cl ? `${cl.company} (Geral)` : "Sem campanha");
                       return (
                         <tr key={p.id} className="border-t border-border hover:bg-muted/10">
                           <td className="px-3 py-2 text-xs">{p.date || "—"}</td>
+                          <td className="px-3 py-2 text-xs font-semibold text-muted-foreground">{campaignDisplayName}</td>
                           <td className="px-3 py-2 font-semibold">{fmtNum(p.views)}</td>
                           <td className="px-3 py-2 text-xs truncate max-w-[100px]">{p.directCall ? "Sim" : "Não"}</td>
                           <td className="px-3 py-2 font-bold text-primary">{fmtBRL(p.valorCalculado ?? 0)}</td>
@@ -528,7 +546,7 @@ function Dashboard() {
                     })}
                     {myProofs.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="text-center py-8 text-muted-foreground text-xs">Nenhum envio registrado ainda.</td>
+                        <td colSpan={7} className="text-center py-8 text-muted-foreground text-xs">Nenhum envio registrado ainda.</td>
                       </tr>
                     )}
                   </tbody>
