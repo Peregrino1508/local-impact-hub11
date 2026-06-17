@@ -27,7 +27,7 @@ const adminNav = [
   { to: "/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/influencers", label: "Influencers", icon: Users },
   { to: "/cadastros", label: "Cadastros Influencers", icon: ClipboardList },
-  { to: "/clientes", label: "Clientes", icon: Briefcase },
+  { to: "/clientes", label: "Empresas", icon: Briefcase },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/provas", label: "Provas de Entrega", icon: ImageIcon },
@@ -136,7 +136,7 @@ export function AppLayout({
               <div className="flex-1 max-w-md mx-auto relative">
                 <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
-                  placeholder="Buscar campanhas, influencers, clientes..."
+                  placeholder="Buscar campanhas, influencers, empresas..."
                   className="w-full pl-9 pr-12 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
                 />
                 <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground border rounded px-1.5 py-0.5">⌘K</kbd>

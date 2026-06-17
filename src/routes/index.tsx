@@ -509,7 +509,7 @@ function Dashboard() {
                   <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px]">Ativo</span>
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Ganhe <strong className="text-foreground">3% de comissão</strong> sobre as contratações de clientes
+                  Ganhe <strong className="text-foreground">3% de comissão</strong> sobre as contratações de empresas
                   que utilizarem seu cupom exclusivo:
                 </p>
                 <div className="flex items-center gap-3 mt-3">
@@ -654,7 +654,7 @@ function Dashboard() {
                   </div>
                   {directCall === "Sim" && (
                     <div className="space-y-1.5 col-span-2 animate-fadeIn">
-                      <label className="text-xs font-semibold">Detalhes e nome dos clientes que chamaram *</label>
+                      <label className="text-xs font-semibold">Detalhes e nome das empresas que chamaram *</label>
                       <textarea
                         required
                         value={directCallDetails}
@@ -888,7 +888,7 @@ function Dashboard() {
                 }}
                 className="w-full appearance-none rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary pr-10 cursor-pointer"
               >
-                <option value="">— Todos os clientes —</option>
+                <option value="">— Todas as empresas —</option>
                 {clients.map((cl: any) => (
                   <option key={cl.id} value={cl.id}>
                     {cl.company}

@@ -25,7 +25,7 @@ export type SistemaConfig = {
   statusPadraoNovaInfluencer: "Ativa" | "Em teste" | "Pausada";
   confiabilidadePadrao: "Alta" | "Média" | "Baixa";
   diasDivulgacaoPadrao: number;
-  // Clientes
+  // Empresas
   statusPadraoNovoCliente: "Ativo" | "Inativo";
   notificarNovoCadastro: boolean;
 };
@@ -158,7 +158,7 @@ function Config() {
       <div className="mb-5 flex items-start gap-3 bg-info/10 border border-info/20 rounded-xl p-4 text-sm text-info">
         <Info className="size-4 mt-0.5 shrink-0" />
         <span>
-          Estas configurações são <strong>globais</strong>: o CPM interno será usado nos cálculos de campanhas, os status padrão serão aplicados nos cadastros de Influencers e Clientes, e os toggles de prova impactam o fluxo de entrega.
+          Estas configurações são <strong>globais</strong>: o CPM interno será usado nos cálculos de campanhas, os status padrão serão aplicados nos cadastros de Influencers e Empresas, e os toggles de prova impactam o fluxo de entrega.
         </span>
       </div>
 
@@ -251,9 +251,9 @@ function Config() {
           </div>
         </Card>
 
-        {/* ── CLIENTES ─────────────────────────────────────────────────────── */}
+        {/* ── EMPRESAS ─────────────────────────────────────────────────────── */}
         <Card className="p-6">
-          <SectionTitle icon={Building2} title="Padrões de Cliente" subtitle="Valores padrão para novos clientes cadastrados" />
+          <SectionTitle icon={Building2} title="Padrões de Empresa" subtitle="Valores padrão para novas empresas cadastradas" />
           <div className="space-y-4">
             <FieldSelect
               label="Status padrão no cadastro"
@@ -264,8 +264,8 @@ function Config() {
               ]}
             />
             <Toggle
-              label="Notificar ao cadastrar novo cliente"
-              hint="Aparece um aviso no dashboard ao adicionar um novo cliente"
+              label="Notificar ao cadastrar nova empresa"
+              hint="Aparece um aviso no dashboard ao adicionar uma nova empresa"
               checked={cfg.notificarNovoCadastro}
               onChange={v => set("notificarNovoCadastro", v)}
             />

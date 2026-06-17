@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { getConfig } from "./configuracoes";
 
 export const Route = createFileRoute("/clientes")({
-  head: () => ({ meta: [{ title: "Clientes — Influence Local" }] }),
+  head: () => ({ meta: [{ title: "Empresas — Influence Local" }] }),
   component: ClientesPage,
 });
 
@@ -74,8 +74,8 @@ function ClientesPage() {
 
   return (
     <AppLayout 
-      title="Clientes" 
-      subtitle="Cadastro e gestão de clientes" 
+      title="Empresas" 
+      subtitle="Cadastro e gestão de empresas" 
       actions={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
