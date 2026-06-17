@@ -19,6 +19,7 @@ export type InfluencerProfile = {
   state: string;
   neighborhood: string;
   googleMapsLink?: string;
+  niche?: string;
 };
 
 export type AuthUser = {
