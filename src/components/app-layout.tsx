@@ -14,9 +14,12 @@ import {
   MessageCircle,
   ShieldCheck,
   LogOut,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -43,6 +46,7 @@ export function AppLayout({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   // Guard: redireciona para login se não autenticado (usando useEffect para evitar render-time navigate)
   useEffect(() => {
@@ -134,6 +138,13 @@ export function AppLayout({
                   <Plus className="size-4" /> Nova Campanha
                 </Link>
               )}
+              <button 
+                onClick={toggleTheme}
+                title="Alternar Tema"
+                className="relative size-10 rounded-lg border border-border flex items-center justify-center hover:bg-muted transition-colors"
+              >
+                {theme === "light" ? <Moon className="size-4" /> : <Sun className="size-4" />}
+              </button>
               <button className="relative size-10 rounded-lg border border-border flex items-center justify-center hover:bg-muted">
                 <Bell className="size-4" />
                 <span className="absolute -top-1 -right-1 size-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">3</span>
@@ -164,7 +175,9 @@ export function AppLayout({
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`bg-card rounded-2xl border border-border shadow-sm ${className}`}>{children}</div>
+    <div className={`bg-gradient-to-br from-card to-muted/30 rounded-2xl border-2 border-border/80 shadow-md shadow-slate-200/40 dark:shadow-none ${className}`}>
+      {children}
+    </div>
   );
 }
 
