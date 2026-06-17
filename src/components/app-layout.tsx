@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   LogOut,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
 const nav = [
@@ -44,16 +44,20 @@ export function AppLayout({
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
-  // Guard: redireciona para login se não autenticado
-  if (!isAuthenticated) {
-    navigate({ to: "/login" });
-    return null;
-  }
+  // Guard: redireciona para login se não autenticado (usando useEffect para evitar render-time navigate)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate({ to: "/login" });
+    }
+  }, [isAuthenticated, navigate]);
 
   function handleLogout() {
     logout();
     navigate({ to: "/login" });
   }
+
+  // Enquanto verifica autenticação, não renderiza nada
+  if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">

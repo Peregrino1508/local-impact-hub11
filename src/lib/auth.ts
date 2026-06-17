@@ -1,7 +1,6 @@
 // ─── Credenciais do Super Admin ───────────────────────────────────────────────
 const SUPER_ADMIN = {
   email: "osprepara2@gmail.com",
-  // Senha armazenada como referência — comparação feita diretamente (projeto local/mock)
   password: "Vitoriadaluz1#$",
   name: "Super Admin",
   role: "super_admin" as const,
@@ -17,13 +16,17 @@ export type AuthUser = {
 
 export type AuthSession = {
   user: AuthUser;
-  expiresAt: number; // timestamp ms
+  expiresAt: number;
 };
 
 const SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 horas
 
+// Helper SSR-safe: só acessa localStorage no browser
+const isBrowser = typeof window !== "undefined";
+
 // ─── Login ────────────────────────────────────────────────────────────────────
 export function login(email: string, password: string): AuthUser | null {
+  if (!isBrowser) return null;
   const emailNorm = email.trim().toLowerCase();
   if (
     emailNorm === SUPER_ADMIN.email.toLowerCase() &&
@@ -46,11 +49,13 @@ export function login(email: string, password: string): AuthUser | null {
 
 // ─── Logout ───────────────────────────────────────────────────────────────────
 export function logout(): void {
+  if (!isBrowser) return;
   localStorage.removeItem(SESSION_KEY);
 }
 
 // ─── Lê sessão ────────────────────────────────────────────────────────────────
 export function getSession(): AuthUser | null {
+  if (!isBrowser) return null;
   try {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
