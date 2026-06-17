@@ -7,6 +7,7 @@ import {
   getInfluencers,
   getProofs,
 } from "@/lib/api.functions";
+import { useState } from "react";
 import {
   Activity,
   Eye,
@@ -14,6 +15,12 @@ import {
   DollarSign,
   TrendingUp,
   Lock,
+  SlidersHorizontal,
+  ChevronDown,
+  BarChart3,
+  CheckCircle2,
+  Clock,
+  Tag,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -62,6 +69,52 @@ function Dashboard() {
     queryFn: () => getProofs(),
   });
 
+  // ── Filtro de análise ─────────────────────────────────────────────────────
+  const [filterClientId, setFilterClientId] = useState("");
+  const [filterInfluencerId, setFilterInfluencerId] = useState("");
+
+  // Influencers que participaram de ao menos uma campanha do cliente selecionado
+  const influencersForClient = filterClientId
+    ? influencers.filter((inf: any) =>
+        campaigns.some((camp: any) =>
+          camp.client_id === filterClientId &&
+          (camp.campaign_influencers || []).some((ci: any) => ci.influencer_id === inf.id)
+        )
+      )
+    : influencers;
+
+  // Campanhas do par cliente + influencer selecionados
+  const filteredCampaigns = campaigns.filter((camp: any) => {
+    const matchClient = filterClientId ? camp.client_id === filterClientId : true;
+    const matchInf = filterInfluencerId
+      ? (camp.campaign_influencers || []).some((ci: any) => ci.influencer_id === filterInfluencerId)
+      : true;
+    return matchClient && matchInf;
+  });
+
+  const selectedClient = clients.find((cl: any) => cl.id === filterClientId);
+  const selectedInfluencer = influencers.find((i: any) => i.id === filterInfluencerId);
+
+  // Métricas do par filtrado
+  const filterStats = (() => {
+    let totalViews = 0, totalPaid = 0, totalRevenue = 0;
+    let campaigns_count = 0, approved = 0, pending = 0;
+    filteredCampaigns.forEach((camp: any) => {
+      campaigns_count++;
+      totalRevenue += camp.client_price || 0;
+      (camp.campaign_influencers || []).forEach((ci: any) => {
+        if (!filterInfluencerId || ci.influencer_id === filterInfluencerId) {
+          totalViews += ci.views_delivered || 0;
+          totalPaid += calcInternalCost(ci.views_delivered || 0, camp.cpm_internal || 20);
+          if (ci.proof_status === "Aprovada") approved++;
+          else pending++;
+        }
+      });
+    });
+    return { totalViews, totalPaid, totalRevenue, campaigns_count, approved, pending };
+  })();
+
+  // ── Dados para o painel padrão ────────────────────────────────────────────
   const activeCampaigns = campaigns.filter((c: any) => c.status === "Em andamento");
   const totalViews = campaigns.reduce((s: number, c: any) => {
     const ciViews = (c.campaign_influencers || []).reduce((sum: number, ci: any) => sum + (ci.views_delivered || 0), 0);
@@ -92,8 +145,210 @@ function Dashboard() {
   const ciList = c?.campaign_influencers || [];
   const ct = campaignTotals(c);
 
+  const hasFilter = filterClientId || filterInfluencerId;
+
   return (
     <AppLayout title="Dashboard" subtitle="Bem-vindo de volta, Admin!">
+
+      {/* ── Painel de Análise por Cliente + Influencer ── */}
+      <Card className="p-5 mb-5 border-2 border-primary/20 bg-primary/5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="size-8 rounded-lg bg-primary/15 flex items-center justify-center">
+            <SlidersHorizontal className="size-4 text-primary" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-sm">Análise Personalizada</h2>
+            <p className="text-xs text-muted-foreground">Selecione um cliente e/ou influencer para ver a análise específica</p>
+          </div>
+          {hasFilter && (
+            <button
+              onClick={() => { setFilterClientId(""); setFilterInfluencerId(""); }}
+              className="ml-auto text-xs text-destructive hover:underline"
+            >
+              Limpar filtros
+            </button>
+          )}
+        </div>
+
+        {/* Selects */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          {/* Cliente */}
+          <div className="relative">
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">👤 Cliente</label>
+            <div className="relative">
+              <select
+                id="filter-client"
+                value={filterClientId}
+                onChange={(e) => { setFilterClientId(e.target.value); setFilterInfluencerId(""); }}
+                className="w-full appearance-none rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary pr-10 cursor-pointer"
+              >
+                <option value="">— Todos os clientes —</option>
+                {clients.map((cl: any) => (
+                  <option key={cl.id} value={cl.id}>{cl.company}</option>
+                ))}
+              </select>
+              <ChevronDown className="size-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Influencer */}
+          <div className="relative">
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">⭐ Influencer</label>
+            <div className="relative">
+              <select
+                id="filter-influencer"
+                value={filterInfluencerId}
+                onChange={(e) => setFilterInfluencerId(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary pr-10 cursor-pointer"
+              >
+                <option value="">— Todas as influencers —</option>
+                {influencersForClient.map((inf: any) => (
+                  <option key={inf.id} value={inf.id}>{inf.name}</option>
+                ))}
+              </select>
+              <ChevronDown className="size-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+        </div>
+
+        {/* Resultado do filtro */}
+        {hasFilter && (
+          <div>
+            {/* Cabeçalho do resultado */}
+            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
+              {selectedClient && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-info/10 border border-info/20 text-info text-xs font-semibold">
+                  👤 {selectedClient.company}
+                </span>
+              )}
+              {selectedInfluencer && (
+                <>
+                  <span className="text-muted-foreground text-sm">×</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
+                    ⭐ {selectedInfluencer.name}
+                  </span>
+                </>
+              )}
+              <span className="ml-auto text-xs text-muted-foreground">
+                {filterStats.campaigns_count} campanha{filterStats.campaigns_count !== 1 ? "s" : ""} encontrada{filterStats.campaigns_count !== 1 ? "s" : ""}
+              </span>
+            </div>
+
+            {filterStats.campaigns_count === 0 ? (
+              <div className="text-center py-6 text-muted-foreground text-sm">
+                Nenhuma campanha encontrada para esta combinação.
+              </div>
+            ) : (
+              <>
+                {/* KPIs do filtro */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+                  <div className="rounded-xl border border-border bg-card p-3 text-center">
+                    <div className="text-xs text-muted-foreground">Campanhas</div>
+                    <div className="text-xl font-bold text-foreground mt-0.5">{filterStats.campaigns_count}</div>
+                  </div>
+                  <div className="rounded-xl border border-border bg-card p-3 text-center">
+                    <div className="text-xs text-muted-foreground">Views entregues</div>
+                    <div className="text-xl font-bold text-primary mt-0.5">{fmtNum(filterStats.totalViews)}</div>
+                  </div>
+                  <div className="rounded-xl border border-border bg-card p-3 text-center">
+                    <div className="text-xs text-muted-foreground">Receita total</div>
+                    <div className="text-xl font-bold text-info mt-0.5">{fmtBRL(filterStats.totalRevenue)}</div>
+                  </div>
+                  <div className="rounded-xl border border-border bg-card p-3 text-center">
+                    <div className="text-xs text-muted-foreground">Pago influencer</div>
+                    <div className="text-xl font-bold text-destructive mt-0.5">{fmtBRL(filterStats.totalPaid)}</div>
+                  </div>
+                  <div className="rounded-xl border border-border bg-card p-3 text-center">
+                    <div className="text-xs text-muted-foreground">Provas aprovadas</div>
+                    <div className="text-xl font-bold text-primary mt-0.5 flex items-center justify-center gap-1">
+                      <CheckCircle2 className="size-4" />{filterStats.approved}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-border bg-card p-3 text-center">
+                    <div className="text-xs text-muted-foreground">Pendentes</div>
+                    <div className="text-xl font-bold text-warning mt-0.5 flex items-center justify-center gap-1">
+                      <Clock className="size-4" />{filterStats.pending}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista de campanhas filtradas */}
+                <div className="space-y-2">
+                  {filteredCampaigns.map((camp: any) => {
+                    const campClient = clients.find((cl: any) => cl.id === camp.client_id);
+                    const relCIs = filterInfluencerId
+                      ? (camp.campaign_influencers || []).filter((ci: any) => ci.influencer_id === filterInfluencerId)
+                      : (camp.campaign_influencers || []);
+                    const campViews = relCIs.reduce((s: number, ci: any) => s + (ci.views_delivered || 0), 0);
+                    const campPaid = relCIs.reduce((s: number, ci: any) => s + calcInternalCost(ci.views_delivered || 0, camp.cpm_internal || 20), 0);
+                    const campProgress = Math.min(100, Math.round((campViews / (camp.views_goal || 1)) * 100));
+                    return (
+                      <div key={camp.id} className="rounded-xl border border-border bg-card p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold text-sm">{camp.name}</span>
+                              <StatusBadge status={camp.status} />
+                            </div>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
+                              <span>👤 {campClient?.company}</span>
+                              <span>📅 {camp.start_date}</span>
+                              <span>⏱ {camp.duration_hours}h</span>
+                              {camp.general_coupon && <span className="flex items-center gap-1"><Tag className="size-3" />{camp.general_coupon}</span>}
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-xs text-muted-foreground">Views</div>
+                            <div className="font-bold text-primary">{fmtNum(campViews)}</div>
+                          </div>
+                        </div>
+                        {/* Barra de progresso */}
+                        <div className="mt-3">
+                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                            <span>Progresso: {campProgress}%</span>
+                            <span>Pago à influencer: <b className="text-foreground">{fmtBRL(campPaid)}</b></span>
+                          </div>
+                          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${campProgress}%` }} />
+                          </div>
+                        </div>
+                        {/* Influencers desta campanha */}
+                        {relCIs.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {relCIs.map((ci: any) => {
+                              const inf = ci.influencer || influencers.find((i: any) => i.id === ci.influencer_id);
+                              return (
+                                <div key={ci.id} className="flex items-center gap-1.5 text-xs bg-muted rounded-lg px-2 py-1">
+                                  <Avatar name={inf?.name || "?"} />
+                                  <span className="font-medium">{inf?.name}</span>
+                                  <span className="text-muted-foreground">·</span>
+                                  <span className="text-primary font-semibold">{fmtNum(ci.views_delivered || 0)} views</span>
+                                  <StatusBadge status={ci.proof_status} />
+                                  <span className="font-mono text-muted-foreground">{ci.coupon}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {!hasFilter && (
+          <div className="flex items-center gap-3 py-2 px-4 rounded-xl bg-muted/40 border border-dashed border-border">
+            <BarChart3 className="size-5 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Selecione um <b>cliente</b> e/ou uma <b>influencer</b> acima para ver a análise detalhada das campanhas.
+            </p>
+          </div>
+        )}
+      </Card>
+
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {stats.map((s) => {
