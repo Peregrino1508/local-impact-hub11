@@ -464,7 +464,7 @@ function Dashboard() {
         }
 
         const valor = (viewsNum * cpmInterno) / 1000;
-        const newProof: ProofEntry = {
+        const newProof = {
           id: "p" + Date.now(),
           influencerId: myInf.id,
           campaignId: proofCampaignId,

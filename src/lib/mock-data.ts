@@ -14,6 +14,7 @@ export type Influencer = {
   lastCampaign?: string;
   notes?: string;
   divulgationDays?: number;
+  email?: string;
 };
 
 export type Client = {
