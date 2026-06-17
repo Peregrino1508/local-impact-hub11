@@ -22,7 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 
 const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/", label: "Área de Trabalho", icon: LayoutDashboard, exact: true },
   { to: "/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/influencers", label: "Influencers", icon: Users },
   { to: "/clientes", label: "Clientes", icon: Briefcase },

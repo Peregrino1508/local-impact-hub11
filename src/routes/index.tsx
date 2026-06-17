@@ -26,7 +26,7 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Influence Local" },
+      { title: "Área de Trabalho — Projeto Influencer" },
       { name: "description", content: "Painel administrativo para gerenciar campanhas de WhatsApp Status com influencers locais." },
     ],
   }),
@@ -148,7 +148,7 @@ function Dashboard() {
   const hasFilter = filterClientId || filterInfluencerId;
 
   return (
-    <AppLayout title="Dashboard" subtitle="Bem-vindo de volta, Admin!">
+    <AppLayout title="Área de Trabalho" subtitle="Bem-vindo de volta, Admin!">
 
       {/* ── Painel de Análise por Cliente + Influencer ── */}
       <Card className="p-5 mb-5 border-2 border-primary/20 bg-primary/5">
