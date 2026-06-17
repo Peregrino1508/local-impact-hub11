@@ -23,7 +23,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 
 const adminNav = [
-  { to: "/", label: "Area de Trabalho", icon: LayoutDashboard, exact: true },
+  { to: "/", label: "Área de Trabalho", icon: LayoutDashboard, exact: true },
   { to: "/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/influencers", label: "Influencers", icon: Users },
   { to: "/cadastros", label: "Cadastros Influencers", icon: ClipboardList },

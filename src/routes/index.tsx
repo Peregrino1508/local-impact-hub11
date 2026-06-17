@@ -33,7 +33,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Area de Trabalho — Projeto Influencer" },
+      { title: "Área de Trabalho — Projeto Influencer" },
       {
         name: "description",
         content: "Painel administrativo para gerenciar campanhas de WhatsApp Status com influencers locais.",
@@ -847,7 +847,7 @@ function Dashboard() {
   const ct = campaignTotals(c);
 
   return (
-    <AppLayout title="Area de Trabalho" subtitle="Bem-vindo de volta, Admin!">
+    <AppLayout title="Área de Trabalho" subtitle="Bem-vindo de volta, Admin!">
       {/* ── Painel de Análise por Cliente + Influencer ── */}
       <Card className="p-5 mb-5 border-2 border-primary/20 bg-primary/5">
         <div className="flex items-center gap-2 mb-4">
