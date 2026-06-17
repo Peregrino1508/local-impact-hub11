@@ -13,6 +13,7 @@ export type Influencer = {
   reliability: "Alta" | "Média" | "Baixa";
   lastCampaign?: string;
   notes?: string;
+  divulgationDays?: number;
 };
 
 export type Client = {
