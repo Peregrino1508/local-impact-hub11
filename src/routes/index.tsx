@@ -1,12 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AppLayout, Card, StatusBadge, Avatar } from "@/components/app-layout";
-import {
-  getCampaigns,
-  getClients,
-  getInfluencers,
-  getProofs,
-} from "@/lib/api.functions";
+import { getCampaigns, getClients, getInfluencers, getProofs } from "@/lib/api.functions";
 import { useState, useEffect } from "react";
 import {
   Activity,
@@ -39,7 +34,10 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Area de Trabalho — Projeto Influencer" },
-      { name: "description", content: "Painel administrativo para gerenciar campanhas de WhatsApp Status com influencers locais." },
+      {
+        name: "description",
+        content: "Painel administrativo para gerenciar campanhas de WhatsApp Status com influencers locais.",
+      },
     ],
   }),
   loader: async ({ context }) => {
@@ -91,16 +89,28 @@ function Dashboard() {
     if (typeof window !== "undefined") {
       try {
         const memC = localStorage.getItem("memoria_clientes");
-        if (memC) { const p = JSON.parse(memC); if (Array.isArray(p)) setClients(p); }
+        if (memC) {
+          const p = JSON.parse(memC);
+          if (Array.isArray(p)) setClients(p);
+        }
 
         const memI = localStorage.getItem("memoria_influencers");
-        if (memI) { const p = JSON.parse(memI); if (Array.isArray(p)) setInfluencers(p); }
+        if (memI) {
+          const p = JSON.parse(memI);
+          if (Array.isArray(p)) setInfluencers(p);
+        }
 
         const memP = localStorage.getItem("memoria_provas");
-        if (memP) { const p = JSON.parse(memP); if (Array.isArray(p)) setProofs(p); }
+        if (memP) {
+          const p = JSON.parse(memP);
+          if (Array.isArray(p)) setProofs(p);
+        }
 
         const memCamp = localStorage.getItem("memoria_campanhas");
-        if (memCamp) { const p = JSON.parse(memCamp); if (Array.isArray(p)) setCampaigns(p); }
+        if (memCamp) {
+          const p = JSON.parse(memCamp);
+          if (Array.isArray(p)) setCampaigns(p);
+        }
       } catch (e) {
         console.error("Erro ao parsear localStorage", e);
       }
@@ -135,7 +145,16 @@ function Dashboard() {
     if (user.influencerStatus === "need_profile") {
       const handleRegisterProfile = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!fullName.trim() || !whatsappVal.trim() || !addressVal.trim() || !cepVal.trim() || !cityVal.trim() || !stateVal.trim() || !neighborhoodVal.trim() || !selectedCompany) {
+        if (
+          !fullName.trim() ||
+          !whatsappVal.trim() ||
+          !addressVal.trim() ||
+          !cepVal.trim() ||
+          !cityVal.trim() ||
+          !stateVal.trim() ||
+          !neighborhoodVal.trim() ||
+          !selectedCompany
+        ) {
           toast.error("Por favor, preencha todos os campos obrigatórios.");
           return;
         }
@@ -207,7 +226,10 @@ function Dashboard() {
         <div className="min-h-screen bg-background p-6 flex items-center justify-center">
           <Card className="w-full max-w-2xl p-8 border-2 border-border shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4">
-              <button onClick={logout} className="text-sm text-muted-foreground hover:text-destructive flex items-center gap-1.5">
+              <button
+                onClick={logout}
+                className="text-sm text-muted-foreground hover:text-destructive flex items-center gap-1.5"
+              >
                 <LogOut className="size-4" /> Sair
               </button>
             </div>
@@ -217,7 +239,9 @@ function Dashboard() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">Cadastrar como Influencer</h1>
-                <p className="text-sm text-muted-foreground">Preencha suas informações para começar a divulgar e lucrar.</p>
+                <p className="text-sm text-muted-foreground">
+                  Preencha suas informações para começar a divulgar e lucrar.
+                </p>
               </div>
             </div>
 
@@ -225,65 +249,128 @@ function Dashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">Nome Completo *</label>
-                  <input required type="text" value={fullName} onChange={e => setFullName(e.target.value)}
-                    placeholder="Ex: Ana Clara Souza" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    required
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Ex: Ana Clara Souza"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">Apelido (Nome Artístico)</label>
-                  <input type="text" value={nickname} onChange={e => setNickname(e.target.value)}
-                    placeholder="Ex: Aninha" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    placeholder="Ex: Aninha"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">WhatsApp (com DDD) *</label>
-                  <input required type="text" value={whatsappVal} onChange={e => setWhatsappVal(e.target.value)}
-                    placeholder="Ex: (11) 98765-4321" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    required
+                    type="text"
+                    value={whatsappVal}
+                    onChange={(e) => setWhatsappVal(e.target.value)}
+                    placeholder="Ex: (11) 98765-4321"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">Qual empresa quer trabalhar? *</label>
-                  <select required value={selectedCompany} onChange={e => setSelectedCompany(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                  <select
+                    required
+                    value={selectedCompany}
+                    onChange={(e) => setSelectedCompany(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  >
                     <option value="">Selecione uma empresa...</option>
-                    {clients.map(c => <option key={c.id} value={c.company}>{c.company}</option>)}
+                    {clients.map((c) => (
+                      <option key={c.id} value={c.company}>
+                        {c.company}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">CEP *</label>
-                  <input required type="text" value={cepVal} onChange={e => setCepVal(e.target.value)}
-                    placeholder="Ex: 01001-000" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    required
+                    type="text"
+                    value={cepVal}
+                    onChange={(e) => setCepVal(e.target.value)}
+                    placeholder="Ex: 01001-000"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">Bairro *</label>
-                  <input required type="text" value={neighborhoodVal} onChange={e => setNeighborhoodVal(e.target.value)}
-                    placeholder="Ex: Pinheiros" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    required
+                    type="text"
+                    value={neighborhoodVal}
+                    onChange={(e) => setNeighborhoodVal(e.target.value)}
+                    placeholder="Ex: Pinheiros"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">Cidade *</label>
-                  <input required type="text" value={cityVal} onChange={e => setCityVal(e.target.value)}
-                    placeholder="Ex: São Paulo" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    required
+                    type="text"
+                    value={cityVal}
+                    onChange={(e) => setCityVal(e.target.value)}
+                    placeholder="Ex: São Paulo"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold">Estado *</label>
-                  <input required type="text" value={stateVal} onChange={e => setStateVal(e.target.value)}
-                    placeholder="Ex: SP" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    required
+                    type="text"
+                    value={stateVal}
+                    onChange={(e) => setStateVal(e.target.value)}
+                    placeholder="Ex: SP"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="col-span-full space-y-1.5">
                   <label className="text-sm font-semibold">Endereço Completo (Rua, Número, Comp.) *</label>
-                  <input required type="text" value={addressVal} onChange={e => setAddressVal(e.target.value)}
-                    placeholder="Ex: Av. Paulista, 1000 - Apto 12" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                  <input
+                    required
+                    type="text"
+                    value={addressVal}
+                    onChange={(e) => setAddressVal(e.target.value)}
+                    placeholder="Ex: Av. Paulista, 1000 - Apto 12"
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                  />
                 </div>
                 <div className="col-span-full space-y-1.5">
                   <label className="text-sm font-semibold">Link de Localização do Google Maps</label>
                   <div className="relative">
                     <MapPin className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="url" value={googleMapsVal} onChange={e => setGoogleMapsVal(e.target.value)}
-                      placeholder="Cole o link do Google Maps da sua localização" className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                    <input
+                      type="url"
+                      value={googleMapsVal}
+                      onChange={(e) => setGoogleMapsVal(e.target.value)}
+                      placeholder="Cole o link do Google Maps da sua localização"
+                      className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                    />
                   </div>
                 </div>
               </div>
 
               <div className="pt-4 flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">* Campos obrigatórios</span>
-                <button type="submit" className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity flex items-center gap-2"
+                >
                   <Send className="size-4" /> Cadastrar como Influencer
                 </button>
               </div>
@@ -299,7 +386,10 @@ function Dashboard() {
         <div className="min-h-screen bg-background p-6 flex items-center justify-center">
           <Card className="w-full max-w-md p-8 border-2 border-border text-center shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4">
-              <button onClick={logout} className="text-sm text-muted-foreground hover:text-destructive flex items-center gap-1.5">
+              <button
+                onClick={logout}
+                className="text-sm text-muted-foreground hover:text-destructive flex items-center gap-1.5"
+              >
                 <LogOut className="size-4" /> Sair
               </button>
             </div>
@@ -308,17 +398,28 @@ function Dashboard() {
             </div>
             <h1 className="text-2xl font-bold text-foreground">Cadastro em Análise</h1>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
-              Olá, <strong className="text-foreground">{user.name}</strong>. Seu cadastro de influencer foi enviado com sucesso e está na fila para aprovação.
+              Olá, <strong className="text-foreground">{user.name}</strong>. Seu cadastro de influencer foi enviado com
+              sucesso e está na fila para aprovação.
             </p>
             <div className="bg-muted/40 p-4 rounded-xl border border-border my-6 text-xs text-left space-y-2">
               <div className="font-semibold text-muted-foreground text-[10px] uppercase">Detalhes da solicitação:</div>
-              <div><strong>Nome:</strong> {user.influencerProfile?.fullName}</div>
-              <div><strong>WhatsApp:</strong> {user.influencerProfile?.whatsapp}</div>
-              <div><strong>Bairro:</strong> {user.influencerProfile?.neighborhood}</div>
-              <div><strong>Status:</strong> <span className="text-warning font-semibold">Aguardando aprovação do administrador</span></div>
+              <div>
+                <strong>Nome:</strong> {user.influencerProfile?.fullName}
+              </div>
+              <div>
+                <strong>WhatsApp:</strong> {user.influencerProfile?.whatsapp}
+              </div>
+              <div>
+                <strong>Bairro:</strong> {user.influencerProfile?.neighborhood}
+              </div>
+              <div>
+                <strong>Status:</strong>{" "}
+                <span className="text-warning font-semibold">Aguardando aprovação do administrador</span>
+              </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Você receberá acesso total ao painel assim que um administrador aprovar sua conta. Obrigado pela paciência!
+              Você receberá acesso total ao painel assim que um administrador aprovar sua conta. Obrigado pela
+              paciência!
             </p>
           </Card>
         </div>
@@ -328,15 +429,27 @@ function Dashboard() {
     // 3. Painel do Influencer Completo (approved)
     if (user.influencerStatus === "approved") {
       // Localiza a influencer nos dados locais
-      const myInf = influencers.find(i => i.email?.toLowerCase() === user.email?.toLowerCase() || i.name?.toLowerCase() === user.name?.toLowerCase()) || influencers[0];
-      const myProofs = proofs.filter(p => p.influencerId === myInf?.id);
+      const myInf =
+        influencers.find(
+          (i) =>
+            i.email?.toLowerCase() === user.email?.toLowerCase() || i.name?.toLowerCase() === user.name?.toLowerCase(),
+        ) || influencers[0];
+      const myProofs = proofs.filter((p) => p.influencerId === myInf?.id);
 
       // Métricas financeiras
       const cpmInterno = getConfig().cpmInterno || 20;
-      const totalViewsEntregues = myProofs.filter(p => p.status === "Aprovada").reduce((s, p) => s + (p.views || 0), 0);
-      const totalPago = myProofs.filter(p => p.paymentStatus === "Pago").reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
-      const totalProcessando = myProofs.filter(p => p.paymentStatus === "Processando").reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
-      const totalALiberar = myProofs.filter(p => p.status === "Aprovada" && p.paymentStatus === "Liberado").reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
+      const totalViewsEntregues = myProofs
+        .filter((p) => p.status === "Aprovada")
+        .reduce((s, p) => s + (p.views || 0), 0);
+      const totalPago = myProofs
+        .filter((p) => p.paymentStatus === "Pago")
+        .reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
+      const totalProcessando = myProofs
+        .filter((p) => p.paymentStatus === "Processando")
+        .reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
+      const totalALiberar = myProofs
+        .filter((p) => p.status === "Aprovada" && p.paymentStatus === "Liberado")
+        .reduce((s, p) => s + (p.valorCalculado ?? 0), 0);
 
       const handleAddProof = (e: React.FormEvent) => {
         e.preventDefault();
@@ -392,14 +505,26 @@ function Dashboard() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-sm text-foreground flex items-center gap-1.5">
-                  🔥 Programa de Afiliados <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px]">Ativo</span>
+                  🔥 Programa de Afiliados{" "}
+                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px]">Ativo</span>
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Ganhe <strong className="text-foreground">3% de comissão</strong> sobre as contratações de clientes que utilizarem seu cupom exclusivo:
+                  Ganhe <strong className="text-foreground">3% de comissão</strong> sobre as contratações de clientes
+                  que utilizarem seu cupom exclusivo:
                 </p>
                 <div className="flex items-center gap-3 mt-3">
-                  <span className="bg-card px-3 py-1.5 rounded-lg border border-border font-mono text-sm font-bold text-primary tracking-wider">{couponCode}</span>
-                  <button onClick={() => { navigator.clipboard.writeText(couponCode); toast.success("Cupom copiado!"); }} className="text-xs text-primary font-semibold hover:underline">Copiar Cupom</button>
+                  <span className="bg-card px-3 py-1.5 rounded-lg border border-border font-mono text-sm font-bold text-primary tracking-wider">
+                    {couponCode}
+                  </span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(couponCode);
+                      toast.success("Cupom copiado!");
+                    }}
+                    className="text-xs text-primary font-semibold hover:underline"
+                  >
+                    Copiar Cupom
+                  </button>
                 </div>
               </div>
             </Card>
@@ -412,7 +537,7 @@ function Dashboard() {
               { label: "A Liberar", value: fmtBRL(totalALiberar), icon: DollarSign, color: "text-primary" },
               { label: "Processando", value: fmtBRL(totalProcessando), icon: Clock, color: "text-orange-400" },
               { label: "Pago", value: fmtBRL(totalPago), icon: CheckCircle2, color: "text-green-400" },
-            ].map(m => (
+            ].map((m) => (
               <Card key={m.label} className="p-4 flex items-center gap-3">
                 <div className="size-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <m.icon className="size-5" />
@@ -435,21 +560,34 @@ function Dashboard() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 col-span-2">
                     <label className="text-xs font-semibold">Campanha vinculada *</label>
-                    <select required value={proofCampaignId} onChange={e => setProofCampaignId(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                    <select
+                      required
+                      value={proofCampaignId}
+                      onChange={(e) => setProofCampaignId(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                    >
                       <option value="">Selecione a campanha/empresa...</option>
                       {campaigns.length > 0 && (
                         <optgroup label="Campanhas Ativas">
-                          {campaigns.map(c => {
-                            const companyName = c.client?.company || clients.find(cl => cl.id === c.client_id)?.company || "Sem Empresa";
-                            return <option key={c.id} value={c.id}>{companyName} — {c.name || c.nome}</option>;
+                          {campaigns.map((c) => {
+                            const companyName =
+                              c.client?.company ||
+                              clients.find((cl) => cl.id === c.client_id)?.company ||
+                              "Sem Empresa";
+                            return (
+                              <option key={c.id} value={c.id}>
+                                {companyName} — {c.name || c.nome}
+                              </option>
+                            );
                           })}
                         </optgroup>
                       )}
                       {clients.length > 0 && (
                         <optgroup label="Empresas (Divulgação Geral)">
-                          {clients.map(cl => (
-                            <option key={cl.id} value={cl.id}>{cl.company} (Geral)</option>
+                          {clients.map((cl) => (
+                            <option key={cl.id} value={cl.id}>
+                              {cl.company} (Geral)
+                            </option>
                           ))}
                         </optgroup>
                       )}
@@ -457,8 +595,12 @@ function Dashboard() {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold">Tipo de Prova *</label>
-                    <select required value={proofType} onChange={e => setProofType(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                    <select
+                      required
+                      value={proofType}
+                      onChange={(e) => setProofType(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                    >
                       <option value="Print das visualizações">Print das visualizações (Status)</option>
                       <option value="Print da postagem">Print da postagem</option>
                       <option value="Gravação de tela">Gravação de tela</option>
@@ -466,25 +608,46 @@ function Dashboard() {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold">Visualizações no Status *</label>
-                    <input required type="number" min={0} value={proofViews} onChange={e => setProofViews(e.target.value)}
-                      placeholder="Ex: 1200" className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                    <input
+                      required
+                      type="number"
+                      min={0}
+                      value={proofViews}
+                      onChange={(e) => setProofViews(e.target.value)}
+                      placeholder="Ex: 1200"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold">Data da Publicação *</label>
-                    <input required type="date" value={proofDate} onChange={e => setProofDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                    <input
+                      required
+                      type="date"
+                      value={proofDate}
+                      onChange={(e) => setProofDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold">Hora da Publicação *</label>
-                    <input required type="text" placeholder="Ex: 08:30" value={proofTime} onChange={e => setProofTime(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                    <input
+                      required
+                      type="text"
+                      placeholder="Ex: 08:30"
+                      value={proofTime}
+                      onChange={(e) => setProofTime(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                    />
                   </div>
                   <div className="space-y-1.5 col-span-2 border-t border-border/60 pt-3">
                     <label className="text-xs font-semibold flex items-center gap-1.5">
                       <PhoneCall className="size-3.5 text-primary animate-bounce" /> Chamada Direta no WhatsApp?
                     </label>
-                    <select value={directCall} onChange={e => setDirectCall(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none">
+                    <select
+                      value={directCall}
+                      onChange={(e) => setDirectCall(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                    >
                       <option value="Não">Não houve chamada direta</option>
                       <option value="Sim">Sim, houve contatos</option>
                     </select>
@@ -492,18 +655,27 @@ function Dashboard() {
                   {directCall === "Sim" && (
                     <div className="space-y-1.5 col-span-2 animate-fadeIn">
                       <label className="text-xs font-semibold">Detalhes e nome dos clientes que chamaram *</label>
-                      <textarea required value={directCallDetails} onChange={e => setDirectCallDetails(e.target.value)}
-                        placeholder="Ex: Cliente Marcos chamou pedindo orçamentos da pizza." rows={2}
-                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none" />
+                      <textarea
+                        required
+                        value={directCallDetails}
+                        onChange={(e) => setDirectCallDetails(e.target.value)}
+                        placeholder="Ex: Cliente Marcos chamou pedindo orçamentos da pizza."
+                        rows={2}
+                        className="w-full px-3 py-2 rounded-lg border border-border bg-card text-sm focus:ring-2 focus:ring-primary/40 focus:outline-none"
+                      />
                     </div>
                   )}
                 </div>
 
                 <div className="bg-muted/30 border border-border p-3 rounded-lg text-xs text-muted-foreground">
-                  Ganhos calculados a <strong className="text-foreground">R$ {cpmInterno} por 1.000 views</strong> (CPM Interno configurado pelo administrador).
+                  Ganhos calculados a <strong className="text-foreground">R$ {cpmInterno} por 1.000 views</strong> (CPM
+                  Interno configurado pelo administrador).
                 </div>
 
-                <button type="submit" className="w-full py-2.5 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-primary text-primary-foreground font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                >
                   Enviar Métrica Diária
                 </button>
               </form>
@@ -528,25 +700,33 @@ function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {myProofs.map(p => {
-                      const c = campaigns.find(x => x.id === p.campaignId);
-                      const cl = clients.find(x => x.id === p.campaignId || x.company === p.campaignId);
-                      const campaignDisplayName = c ? (c.name || c.nome) : (cl ? `${cl.company} (Geral)` : "Sem campanha");
+                    {myProofs.map((p) => {
+                      const c = campaigns.find((x) => x.id === p.campaignId);
+                      const cl = clients.find((x) => x.id === p.campaignId || x.company === p.campaignId);
+                      const campaignDisplayName = c ? c.name || c.nome : cl ? `${cl.company} (Geral)` : "Sem campanha";
                       return (
                         <tr key={p.id} className="border-t border-border hover:bg-muted/10">
                           <td className="px-3 py-2 text-xs">{p.date || "—"}</td>
-                          <td className="px-3 py-2 text-xs font-semibold text-muted-foreground">{campaignDisplayName}</td>
+                          <td className="px-3 py-2 text-xs font-semibold text-muted-foreground">
+                            {campaignDisplayName}
+                          </td>
                           <td className="px-3 py-2 font-semibold">{fmtNum(p.views)}</td>
                           <td className="px-3 py-2 text-xs truncate max-w-[100px]">{p.directCall ? "Sim" : "Não"}</td>
                           <td className="px-3 py-2 font-bold text-primary">{fmtBRL(p.valorCalculado ?? 0)}</td>
-                          <td className="px-3 py-2"><StatusBadge status={p.status} /></td>
-                          <td className="px-3 py-2"><StatusBadge status={p.paymentStatus || "Pendente"} /></td>
+                          <td className="px-3 py-2">
+                            <StatusBadge status={p.status} />
+                          </td>
+                          <td className="px-3 py-2">
+                            <StatusBadge status={p.paymentStatus || "Pendente"} />
+                          </td>
                         </tr>
                       );
                     })}
                     {myProofs.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="text-center py-8 text-muted-foreground text-xs">Nenhum envio registrado ainda.</td>
+                        <td colSpan={7} className="text-center py-8 text-muted-foreground text-xs">
+                          Nenhum envio registrado ainda.
+                        </td>
                       </tr>
                     )}
                   </tbody>
@@ -565,17 +745,23 @@ function Dashboard() {
 
   // Influencers que participaram de ao menos uma campanha do cliente selecionado
   const influencersForClient = filterClientId
-    ? influencers.filter((inf: any) =>
-        campaigns.some((camp: any) =>
-          (camp.client_id === filterClientId || camp.client?.company === clients.find((c:any) => c.id === filterClientId)?.company) &&
-          (camp.campaign_influencers || []).some((ci: any) => ci.influencer_id === inf.id)
-        ) || inf.niche === clients.find((c:any) => c.id === filterClientId)?.company // fallback para mock
+    ? influencers.filter(
+        (inf: any) =>
+          campaigns.some(
+            (camp: any) =>
+              (camp.client_id === filterClientId ||
+                camp.client?.company === clients.find((c: any) => c.id === filterClientId)?.company) &&
+              (camp.campaign_influencers || []).some((ci: any) => ci.influencer_id === inf.id),
+          ) || inf.niche === clients.find((c: any) => c.id === filterClientId)?.company, // fallback para mock
       )
     : influencers;
 
   // Campanhas do par cliente + influencer selecionados
   const filteredCampaigns = campaigns.filter((camp: any) => {
-    const matchClient = filterClientId ? (camp.client_id === filterClientId || camp.client?.company === clients.find((c:any) => c.id === filterClientId)?.company) : true;
+    const matchClient = filterClientId
+      ? camp.client_id === filterClientId ||
+        camp.client?.company === clients.find((c: any) => c.id === filterClientId)?.company
+      : true;
     const matchInf = filterInfluencerId
       ? (camp.campaign_influencers || []).some((ci: any) => ci.influencer_id === filterInfluencerId)
       : true;
@@ -591,8 +777,12 @@ function Dashboard() {
 
   // Métricas do par filtrado
   const filterStats = (() => {
-    let totalViews = 0, totalPaid = 0, totalRevenue = 0;
-    let campaigns_count = 0, approved = 0, pending = 0;
+    let totalViews = 0,
+      totalPaid = 0,
+      totalRevenue = 0;
+    let campaigns_count = 0,
+      approved = 0,
+      pending = 0;
     filteredCampaigns.forEach((camp: any) => {
       campaigns_count++;
       totalRevenue += camp.client_price || 0;
@@ -620,16 +810,28 @@ function Dashboard() {
   const internalCost = campaigns.reduce((s: number, c: any) => {
     const ciCost = (c.campaign_influencers || []).reduce(
       (sum: number, ci: any) => sum + calcInternalCost(ci.views_delivered || 0, c.cpm_internal || cpmPadrao),
-      0
+      0,
     );
     return s + ciCost;
   }, 0);
   const margin = revenue - internalCost;
 
   const stats = [
-    { label: "Campanhas Ativas", value: String(activeCampaigns.length), delta: "+20%", icon: Activity, color: "primary" },
+    {
+      label: "Campanhas Ativas",
+      value: String(activeCampaigns.length),
+      delta: "+20%",
+      icon: Activity,
+      color: "primary",
+    },
     { label: "Visualizações Entregues", value: fmtNum(totalViews), delta: "+32%", icon: Eye, color: "info" },
-    { label: "Influencers Ativas", value: String(influencers.filter((i: any) => i.status === "Ativa").length), delta: "+15%", icon: Users, color: "primary" },
+    {
+      label: "Influencers Ativas",
+      value: String(influencers.filter((i: any) => i.status === "Ativa").length),
+      delta: "+15%",
+      icon: Users,
+      color: "primary",
+    },
     { label: "Receita do Mês", value: fmtBRL(revenue), delta: "+28%", icon: DollarSign, color: "info" },
     { label: "Margem Bruta Interna", value: fmtBRL(margin), delta: "+26%", icon: TrendingUp, color: "primary" },
   ];
@@ -638,9 +840,7 @@ function Dashboard() {
   const hasFilter = filterClientId || filterInfluencerId;
 
   // Se houver filtro, c deve ser do filtro. Se não houver, pega o global.
-  const c = hasFilter 
-    ? (filteredActiveCampaigns[0] ?? filteredCampaigns[0])
-    : (activeCampaigns[0] ?? campaigns[0]);
+  const c = hasFilter ? (filteredActiveCampaigns[0] ?? filteredCampaigns[0]) : (activeCampaigns[0] ?? campaigns[0]);
 
   const client = clients.find((cl: any) => cl.id === c?.client_id);
   const ciList = c?.campaign_influencers || [];
@@ -648,7 +848,6 @@ function Dashboard() {
 
   return (
     <AppLayout title="Area de Trabalho" subtitle="Bem-vindo de volta, Admin!">
-
       {/* ── Painel de Análise por Cliente + Influencer ── */}
       <Card className="p-5 mb-5 border-2 border-primary/20 bg-primary/5">
         <div className="flex items-center gap-2 mb-4">
@@ -657,11 +856,16 @@ function Dashboard() {
           </div>
           <div>
             <h2 className="font-semibold text-sm">Análise Personalizada</h2>
-            <p className="text-xs text-muted-foreground">Selecione um cliente e/ou influencer para ver a análise específica</p>
+            <p className="text-xs text-muted-foreground">
+              Selecione um cliente e/ou influencer para ver a análise específica
+            </p>
           </div>
           {hasFilter && (
             <button
-              onClick={() => { setFilterClientId(""); setFilterInfluencerId(""); }}
+              onClick={() => {
+                setFilterClientId("");
+                setFilterInfluencerId("");
+              }}
               className="ml-auto text-xs text-destructive hover:underline"
             >
               Limpar filtros
@@ -678,12 +882,17 @@ function Dashboard() {
               <select
                 id="filter-client"
                 value={filterClientId}
-                onChange={(e) => { setFilterClientId(e.target.value); setFilterInfluencerId(""); }}
+                onChange={(e) => {
+                  setFilterClientId(e.target.value);
+                  setFilterInfluencerId("");
+                }}
                 className="w-full appearance-none rounded-xl border border-border bg-card px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary pr-10 cursor-pointer"
               >
                 <option value="">— Todos os clientes —</option>
                 {clients.map((cl: any) => (
-                  <option key={cl.id} value={cl.id}>{cl.company}</option>
+                  <option key={cl.id} value={cl.id}>
+                    {cl.company}
+                  </option>
                 ))}
               </select>
               <ChevronDown className="size-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -702,7 +911,9 @@ function Dashboard() {
               >
                 <option value="">— Todas as influencers —</option>
                 {influencersForClient.map((inf: any) => (
-                  <option key={inf.id} value={inf.id}>{inf.name}</option>
+                  <option key={inf.id} value={inf.id}>
+                    {inf.name}
+                  </option>
                 ))}
               </select>
               <ChevronDown className="size-4 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -729,7 +940,8 @@ function Dashboard() {
                 </>
               )}
               <span className="ml-auto text-xs text-muted-foreground">
-                {filterStats.campaigns_count} campanha{filterStats.campaigns_count !== 1 ? "s" : ""} encontrada{filterStats.campaigns_count !== 1 ? "s" : ""}
+                {filterStats.campaigns_count} campanha{filterStats.campaigns_count !== 1 ? "s" : ""} encontrada
+                {filterStats.campaigns_count !== 1 ? "s" : ""}
               </span>
             </div>
 
@@ -760,13 +972,15 @@ function Dashboard() {
                   <div className="rounded-xl border border-border bg-card p-3 text-center">
                     <div className="text-xs text-muted-foreground">Provas aprovadas</div>
                     <div className="text-xl font-bold text-primary mt-0.5 flex items-center justify-center gap-1">
-                      <CheckCircle2 className="size-4" />{filterStats.approved}
+                      <CheckCircle2 className="size-4" />
+                      {filterStats.approved}
                     </div>
                   </div>
                   <div className="rounded-xl border border-border bg-card p-3 text-center">
                     <div className="text-xs text-muted-foreground">Pendentes</div>
                     <div className="text-xl font-bold text-warning mt-0.5 flex items-center justify-center gap-1">
-                      <Clock className="size-4" />{filterStats.pending}
+                      <Clock className="size-4" />
+                      {filterStats.pending}
                     </div>
                   </div>
                 </div>
@@ -777,9 +991,12 @@ function Dashboard() {
                     const campClient = clients.find((cl: any) => cl.id === camp.client_id);
                     const relCIs = filterInfluencerId
                       ? (camp.campaign_influencers || []).filter((ci: any) => ci.influencer_id === filterInfluencerId)
-                      : (camp.campaign_influencers || []);
+                      : camp.campaign_influencers || [];
                     const campViews = relCIs.reduce((s: number, ci: any) => s + (ci.views_delivered || 0), 0);
-                    const campPaid = relCIs.reduce((s: number, ci: any) => s + calcInternalCost(ci.views_delivered || 0, camp.cpm_internal || 20), 0);
+                    const campPaid = relCIs.reduce(
+                      (s: number, ci: any) => s + calcInternalCost(ci.views_delivered || 0, camp.cpm_internal || 20),
+                      0,
+                    );
                     const campProgress = Math.min(100, Math.round((campViews / (camp.views_goal || 1)) * 100));
                     return (
                       <div key={camp.id} className="rounded-xl border border-border bg-card p-4">
@@ -793,7 +1010,12 @@ function Dashboard() {
                               <span>👤 {campClient?.company}</span>
                               <span>📅 {camp.start_date}</span>
                               <span>⏱ {camp.duration_hours}h</span>
-                              {camp.general_coupon && <span className="flex items-center gap-1"><Tag className="size-3" />{camp.general_coupon}</span>}
+                              {camp.general_coupon && (
+                                <span className="flex items-center gap-1">
+                                  <Tag className="size-3" />
+                                  {camp.general_coupon}
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div className="text-right shrink-0">
@@ -805,10 +1027,15 @@ function Dashboard() {
                         <div className="mt-3">
                           <div className="flex justify-between text-xs text-muted-foreground mb-1">
                             <span>Progresso: {campProgress}%</span>
-                            <span>Pago à influencer: <b className="text-foreground">{fmtBRL(campPaid)}</b></span>
+                            <span>
+                              Pago à influencer: <b className="text-foreground">{fmtBRL(campPaid)}</b>
+                            </span>
                           </div>
                           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${campProgress}%` }} />
+                            <div
+                              className="h-full bg-primary rounded-full transition-all"
+                              style={{ width: `${campProgress}%` }}
+                            />
                           </div>
                         </div>
                         {/* Influencers desta campanha */}
@@ -817,11 +1044,16 @@ function Dashboard() {
                             {relCIs.map((ci: any) => {
                               const inf = ci.influencer || influencers.find((i: any) => i.id === ci.influencer_id);
                               return (
-                                <div key={ci.id} className="flex items-center gap-1.5 text-xs bg-muted rounded-lg px-2 py-1">
+                                <div
+                                  key={ci.id}
+                                  className="flex items-center gap-1.5 text-xs bg-muted rounded-lg px-2 py-1"
+                                >
                                   <Avatar name={inf?.name || "?"} />
                                   <span className="font-medium">{inf?.name}</span>
                                   <span className="text-muted-foreground">·</span>
-                                  <span className="text-primary font-semibold">{fmtNum(ci.views_delivered || 0)} views</span>
+                                  <span className="text-primary font-semibold">
+                                    {fmtNum(ci.views_delivered || 0)} views
+                                  </span>
                                   <StatusBadge status={ci.proof_status} />
                                   <span className="font-mono text-muted-foreground">{ci.coupon}</span>
                                 </div>
@@ -855,7 +1087,9 @@ function Dashboard() {
           return (
             <Card key={s.label} className="p-5">
               <div className="flex items-start gap-3">
-                <div className={`size-11 rounded-xl flex items-center justify-center ${s.color === "primary" ? "bg-primary/10 text-primary" : "bg-info/10 text-info"}`}>
+                <div
+                  className={`size-11 rounded-xl flex items-center justify-center ${s.color === "primary" ? "bg-primary/10 text-primary" : "bg-info/10 text-info"}`}
+                >
                   <Icon className="size-5" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -875,7 +1109,11 @@ function Dashboard() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold">Campanha em Andamento</h2>
-              <Link to="/campanhas/$id" params={{ id: c?.id }} className="text-sm border border-border rounded-md px-3 py-1.5 hover:bg-muted">
+              <Link
+                to="/campanhas/$id"
+                params={{ id: c?.id }}
+                className="text-sm border border-border rounded-md px-3 py-1.5 hover:bg-muted"
+              >
                 Ver detalhes
               </Link>
             </div>
@@ -886,8 +1124,12 @@ function Dashboard() {
               <div className="flex-1">
                 <h3 className="text-lg font-bold">{c?.name}</h3>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
-                  <span>👤 Cliente: <b className="text-foreground">{client?.company}</b></span>
-                  <span>📊 Status: <StatusBadge status={c?.status} /></span>
+                  <span>
+                    👤 Cliente: <b className="text-foreground">{client?.company}</b>
+                  </span>
+                  <span>
+                    📊 Status: <StatusBadge status={c?.status} />
+                  </span>
                   <span>⏱ Duração: {c?.duration_hours} horas</span>
                 </div>
               </div>
@@ -914,16 +1156,24 @@ function Dashboard() {
               <div className="text-right text-xs text-muted-foreground mt-1">{ct.progress}%</div>
             </div>
             <div className="flex justify-between text-sm mt-4">
-              <span className="text-muted-foreground">Pacote vendido ao cliente: <b className="text-primary">{fmtBRL(c?.client_price || 0)}</b></span>
-              <span className="text-muted-foreground">Status de entrega: <StatusBadge status={`${ct.progress}% concluído`} /></span>
+              <span className="text-muted-foreground">
+                Pacote vendido ao cliente: <b className="text-primary">{fmtBRL(c?.client_price || 0)}</b>
+              </span>
+              <span className="text-muted-foreground">
+                Status de entrega: <StatusBadge status={`${ct.progress}% concluído`} />
+              </span>
             </div>
           </Card>
 
           {/* Influencers in campaign */}
           <Card className="p-6 lg:col-span-1">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold flex items-center gap-2"><Users className="size-4 text-primary" /> Influencers da Campanha</h2>
-              <Link to="/campanhas/$id" params={{ id: c?.id }} className="text-sm text-primary hover:underline">Ver todas</Link>
+              <h2 className="font-semibold flex items-center gap-2">
+                <Users className="size-4 text-primary" /> Influencers da Campanha
+              </h2>
+              <Link to="/campanhas/$id" params={{ id: c?.id }} className="text-sm text-primary hover:underline">
+                Ver todas
+              </Link>
             </div>
             <div className="overflow-x-auto -mx-2">
               <table className="w-full text-sm">
@@ -935,7 +1185,9 @@ function Dashboard() {
                     <th className="font-medium py-2 px-2">Status</th>
                     <th className="font-medium py-2 px-2">Prova</th>
                     <th className="font-medium py-2 px-2">Cupom</th>
-                    <th className="font-medium py-2 px-2 flex items-center gap-1">Pagto <Lock className="size-3" /></th>
+                    <th className="font-medium py-2 px-2 flex items-center gap-1">
+                      Pagto <Lock className="size-3" />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -943,13 +1195,22 @@ function Dashboard() {
                     const inf = ci.influencer;
                     return (
                       <tr key={ci.id} className="border-t border-border">
-                        <td className="py-2 px-2 flex items-center gap-2"><Avatar name={inf?.name || ""} />{inf?.name}</td>
+                        <td className="py-2 px-2 flex items-center gap-2">
+                          <Avatar name={inf?.name || ""} />
+                          {inf?.name}
+                        </td>
                         <td className="py-2 px-2 text-muted-foreground">{inf?.neighborhood}</td>
                         <td className="py-2 px-2">{fmtNum(ci.views_delivered || 0)}</td>
-                        <td className="py-2 px-2"><StatusBadge status={ci.post_status} /></td>
-                        <td className="py-2 px-2"><StatusBadge status={ci.proof_status} /></td>
+                        <td className="py-2 px-2">
+                          <StatusBadge status={ci.post_status} />
+                        </td>
+                        <td className="py-2 px-2">
+                          <StatusBadge status={ci.proof_status} />
+                        </td>
                         <td className="py-2 px-2 text-xs font-mono">{ci.coupon}</td>
-                        <td className="py-2 px-2 font-semibold">{fmtBRL(calcInternalCost(ci.views_delivered || 0, c?.cpm_internal || 20))}</td>
+                        <td className="py-2 px-2 font-semibold">
+                          {fmtBRL(calcInternalCost(ci.views_delivered || 0, c?.cpm_internal || 20))}
+                        </td>
                       </tr>
                     );
                   })}
@@ -962,17 +1223,26 @@ function Dashboard() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold flex items-center gap-2">📄 Relatório do Cliente</h2>
-              <Link to="/relatorios" className="text-xs border border-border rounded-md px-3 py-1.5 hover:bg-muted">Visão do Cliente</Link>
+              <Link to="/relatorios" className="text-xs border border-border rounded-md px-3 py-1.5 hover:bg-muted">
+                Visão do Cliente
+              </Link>
             </div>
             <div className="flex items-center gap-3 mb-4">
               <div className="size-12 rounded-xl bg-gradient-to-br from-primary/30 to-info/30" />
               <div>
                 <div className="font-bold">{c?.name}</div>
-                <div className="text-xs text-muted-foreground">Cliente: {client?.company} · <StatusBadge status={c?.status} /></div>
+                <div className="text-xs text-muted-foreground">
+                  Cliente: {client?.company} · <StatusBadge status={c?.status} />
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <MiniStat label="Total de visualizações entregues" value={fmtNum(ct.viewsDelivered)} sub="views" color="primary" />
+              <MiniStat
+                label="Total de visualizações entregues"
+                value={fmtNum(ct.viewsDelivered)}
+                sub="views"
+                color="primary"
+              />
               <MiniStat label="Influencers participantes" value={String(ciList.length)} color="foreground" />
               <MiniStat label="Proofs de postagem" value={String(proofs.length)} color="foreground" />
               <MiniStat label="Horários de publicação" value="13:02 - 19:45" color="foreground" small />
@@ -990,44 +1260,59 @@ function Dashboard() {
       <Card className="p-6 mt-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold">Provas de Entrega</h2>
-          <Link to="/provas" className="text-sm text-primary hover:underline">Ver todas</Link>
+          <Link to="/provas" className="text-sm text-primary hover:underline">
+            Ver todas
+          </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {proofs.filter((p: any) => {
-            const matchInf = filterInfluencerId ? p.influencerId === filterInfluencerId || p.influencer?.id === filterInfluencerId : true;
-            return matchInf;
-          }).slice(0, 4).map((p: any) => {
-            const inf = influencers.find((i:any) => i.id === p.influencerId) || p.influencer;
-            return (
-              <div key={p.id} className="border border-border rounded-xl overflow-hidden">
-                <div className="flex">
-                  <div className="w-1/2 aspect-[9/16] bg-gradient-to-br from-sidebar to-primary/40 flex items-center justify-center text-primary-foreground text-xs">
-                    Story
-                  </div>
-                  <div className="w-1/2 p-3 flex flex-col items-center justify-center bg-muted/30">
-                    <div className="text-xs text-muted-foreground">Visualizações</div>
-                    <div className="relative size-16 mt-1">
-                      <svg viewBox="0 0 36 36" className="size-16 -rotate-90">
-                        <circle cx="18" cy="18" r="15" fill="none" className="stroke-muted" strokeWidth="3" />
-                        <circle cx="18" cy="18" r="15" fill="none" className="stroke-primary" strokeWidth="3" strokeDasharray={`${Math.min(100, ((p.views||0) / 1500) * 100)} 100`} />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <div className="font-bold text-sm">{fmtNum(p.views || 0)}</div>
-                      </div>
+          {proofs
+            .filter((p: any) => {
+              const matchInf = filterInfluencerId
+                ? p.influencerId === filterInfluencerId || p.influencer?.id === filterInfluencerId
+                : true;
+              return matchInf;
+            })
+            .slice(0, 4)
+            .map((p: any) => {
+              const inf = influencers.find((i: any) => i.id === p.influencerId) || p.influencer;
+              return (
+                <div key={p.id} className="border border-border rounded-xl overflow-hidden">
+                  <div className="flex">
+                    <div className="w-1/2 aspect-[9/16] bg-gradient-to-br from-sidebar to-primary/40 flex items-center justify-center text-primary-foreground text-xs">
+                      Story
                     </div>
-                    <div className="text-[10px] text-muted-foreground mt-1">em 24h</div>
+                    <div className="w-1/2 p-3 flex flex-col items-center justify-center bg-muted/30">
+                      <div className="text-xs text-muted-foreground">Visualizações</div>
+                      <div className="relative size-16 mt-1">
+                        <svg viewBox="0 0 36 36" className="size-16 -rotate-90">
+                          <circle cx="18" cy="18" r="15" fill="none" className="stroke-muted" strokeWidth="3" />
+                          <circle
+                            cx="18"
+                            cy="18"
+                            r="15"
+                            fill="none"
+                            className="stroke-primary"
+                            strokeWidth="3"
+                            strokeDasharray={`${Math.min(100, ((p.views || 0) / 1500) * 100)} 100`}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <div className="font-bold text-sm">{fmtNum(p.views || 0)}</div>
+                        </div>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground mt-1">em 24h</div>
+                    </div>
+                  </div>
+                  <div className="p-3 flex items-center justify-between text-xs border-t border-border">
+                    <div>
+                      <div className="text-muted-foreground">{p.publishedAt || p.published_at}</div>
+                      <div className="font-medium">{inf?.name}</div>
+                    </div>
+                    <StatusBadge status={p.status === "Aprovada" ? "Aprovada" : "Pendente"} />
                   </div>
                 </div>
-                <div className="p-3 flex items-center justify-between text-xs border-t border-border">
-                  <div>
-                    <div className="text-muted-foreground">{p.publishedAt || p.published_at}</div>
-                    <div className="font-medium">{inf?.name}</div>
-                  </div>
-                  <StatusBadge status={p.status === "Aprovada" ? "Aprovada" : "Pendente"} />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </Card>
 
@@ -1036,8 +1321,12 @@ function Dashboard() {
         <Card className="p-6 lg:col-span-1">
           <h3 className="font-semibold mb-1">Desempenho da Campanha</h3>
           <div className="flex gap-3 text-xs text-muted-foreground mb-3">
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-info inline-block" /> Meta de views</span>
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-primary inline-block" /> Views entregues</span>
+            <span className="flex items-center gap-1">
+              <span className="size-2 rounded-full bg-info inline-block" /> Meta de views
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="size-2 rounded-full bg-primary inline-block" /> Views entregues
+            </span>
           </div>
           <PerformanceChart />
         </Card>
@@ -1058,15 +1347,20 @@ function Dashboard() {
         <Card className="p-6">
           <h3 className="font-semibold mb-3">Top Influencers</h3>
           <ul className="space-y-3">
-            {[...influencers].sort((a: any, b: any) => (b.avg_views || 0) - (a.avg_views || 0)).map((i: any) => (
-              <li key={i.id} className="flex items-center gap-3 text-sm">
-                <span className="w-20 truncate">{i.name}</span>
-                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary rounded-full" style={{ width: `${(i.avg_views / 1500) * 100}%` }} />
-                </div>
-                <span className="font-semibold text-sm w-12 text-right">{fmtNum(i.avg_views || 0)}</span>
-              </li>
-            ))}
+            {[...influencers]
+              .sort((a: any, b: any) => (b.avg_views || 0) - (a.avg_views || 0))
+              .map((i: any) => (
+                <li key={i.id} className="flex items-center gap-3 text-sm">
+                  <span className="w-20 truncate">{i.name}</span>
+                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary rounded-full"
+                      style={{ width: `${(i.avg_views / 1500) * 100}%` }}
+                    />
+                  </div>
+                  <span className="font-semibold text-sm w-12 text-right">{fmtNum(i.avg_views || 0)}</span>
+                </li>
+              ))}
           </ul>
         </Card>
       </div>
@@ -1074,7 +1368,19 @@ function Dashboard() {
   );
 }
 
-function MiniStat({ label, value, sub, color = "foreground", small = false }: { label: string; value: string; sub?: string; color?: string; small?: boolean }) {
+function MiniStat({
+  label,
+  value,
+  sub,
+  color = "foreground",
+  small = false,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  color?: string;
+  small?: boolean;
+}) {
   const colorMap: Record<string, string> = {
     foreground: "text-foreground",
     primary: "text-primary",
@@ -1095,7 +1401,9 @@ function Legend({ color, label, pct, v }: { color: string; label: string; pct: s
     <li className="flex items-center gap-2">
       <span className={`size-2.5 rounded-full ${color}`} />
       <span className="flex-1">{label}</span>
-      <span className="text-muted-foreground">{pct} ({v})</span>
+      <span className="text-muted-foreground">
+        {pct} ({v})
+      </span>
     </li>
   );
 }
@@ -1109,7 +1417,9 @@ function PerformanceChart() {
       <path d={goal} className="stroke-info" strokeWidth="1.5" strokeDasharray="4 4" fill="none" />
       <path d={path} className="stroke-primary" strokeWidth="2.5" fill="none" />
       <circle cx="280" cy={100 - 68} r="3" className="fill-primary" />
-      <text x="260" y={100 - 75} className="fill-primary text-[8px] font-bold">6.850</text>
+      <text x="260" y={100 - 75} className="fill-primary text-[8px] font-bold">
+        6.850
+      </text>
     </svg>
   );
 }
@@ -1129,7 +1439,17 @@ function DonutChart() {
       {segs.map((s, i) => {
         const len = (s.v / 100) * C;
         const el = (
-          <circle key={i} cx="20" cy="20" r="16" fill="none" stroke={s.color} strokeWidth="6" strokeDasharray={`${len} ${C - len}`} strokeDashoffset={-offset} />
+          <circle
+            key={i}
+            cx="20"
+            cy="20"
+            r="16"
+            fill="none"
+            stroke={s.color}
+            strokeWidth="6"
+            strokeDasharray={`${len} ${C - len}`}
+            strokeDashoffset={-offset}
+          />
         );
         offset += len;
         return el;
@@ -1145,7 +1465,10 @@ export const fmtNum = (n: number) => n.toLocaleString("pt-BR");
 
 export function campaignTotals(c: any) {
   const viewsDelivered = (c?.campaign_influencers || []).reduce((s: number, i: any) => s + (i.views_delivered || 0), 0);
-  const internalCost = (c?.campaign_influencers || []).reduce((s: number, i: any) => s + calcInternalCost(i.views_delivered || 0, c?.cpm_internal || 20), 0);
+  const internalCost = (c?.campaign_influencers || []).reduce(
+    (s: number, i: any) => s + calcInternalCost(i.views_delivered || 0, c?.cpm_internal || 20),
+    0,
+  );
   const grossMargin = (c?.client_price || 0) - internalCost;
   const progress = Math.min(100, Math.round((viewsDelivered / (c?.views_goal || 1)) * 100));
   return { viewsDelivered, internalCost, grossMargin, progress };
