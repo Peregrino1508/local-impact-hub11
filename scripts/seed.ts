@@ -1,10 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.SUPABASE_URL || "https://irewbhcnazteojoirsyg.supabase.co",
+  process.env.SUPABASE_PUBLISHABLE_KEY!,
   { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } }
 );
+
 
 async function seed() {
   // Seed clients
