@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as ProvasRouteImport } from './routes/provas'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as InfluencersRouteImport } from './routes/influencers'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
@@ -28,6 +29,11 @@ const RelatoriosRoute = RelatoriosRouteImport.update({
 const ProvasRoute = ProvasRouteImport.update({
   id: '/provas',
   path: '/provas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InfluencersRoute = InfluencersRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof ConfiguracoesRoute
   '/financeiro': typeof FinanceiroRoute
   '/influencers': typeof InfluencersRoute
+  '/login': typeof LoginRoute
   '/provas': typeof ProvasRoute
   '/relatorios': typeof RelatoriosRoute
   '/api/seed': typeof ApiSeedRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/configuracoes': typeof ConfiguracoesRoute
   '/financeiro': typeof FinanceiroRoute
   '/influencers': typeof InfluencersRoute
+  '/login': typeof LoginRoute
   '/provas': typeof ProvasRoute
   '/relatorios': typeof RelatoriosRoute
   '/api/seed': typeof ApiSeedRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/configuracoes': typeof ConfiguracoesRoute
   '/financeiro': typeof FinanceiroRoute
   '/influencers': typeof InfluencersRoute
+  '/login': typeof LoginRoute
   '/provas': typeof ProvasRoute
   '/relatorios': typeof RelatoriosRoute
   '/api/seed': typeof ApiSeedRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/financeiro'
     | '/influencers'
+    | '/login'
     | '/provas'
     | '/relatorios'
     | '/api/seed'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/financeiro'
     | '/influencers'
+    | '/login'
     | '/provas'
     | '/relatorios'
     | '/api/seed'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/financeiro'
     | '/influencers'
+    | '/login'
     | '/provas'
     | '/relatorios'
     | '/api/seed'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   FinanceiroRoute: typeof FinanceiroRoute
   InfluencersRoute: typeof InfluencersRoute
+  LoginRoute: typeof LoginRoute
   ProvasRoute: typeof ProvasRoute
   RelatoriosRoute: typeof RelatoriosRoute
   ApiSeedRoute: typeof ApiSeedRoute
@@ -173,6 +186,13 @@ declare module '@tanstack/react-router' {
       path: '/provas'
       fullPath: '/provas'
       preLoaderRoute: typeof ProvasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/influencers': {
@@ -253,6 +273,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfiguracoesRoute: ConfiguracoesRoute,
   FinanceiroRoute: FinanceiroRoute,
   InfluencersRoute: InfluencersRoute,
+  LoginRoute: LoginRoute,
   ProvasRoute: ProvasRoute,
   RelatoriosRoute: RelatoriosRoute,
   ApiSeedRoute: ApiSeedRoute,
@@ -260,3 +281,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Megaphone,
@@ -13,8 +13,10 @@ import {
   Plus,
   MessageCircle,
   ShieldCheck,
+  LogOut,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -39,6 +41,19 @@ export function AppLayout({
   children: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  // Guard: redireciona para login se não autenticado
+  if (!isAuthenticated) {
+    navigate({ to: "/login" });
+    return null;
+  }
+
+  function handleLogout() {
+    logout();
+    navigate({ to: "/login" });
+  }
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
@@ -122,10 +137,18 @@ export function AppLayout({
               <div className="flex items-center gap-2 pl-2 border-l border-border">
                 <div className="size-10 rounded-full bg-gradient-to-br from-sidebar to-primary" />
                 <div className="text-sm leading-tight">
-                  <div className="font-semibold">Admin</div>
-                  <div className="text-xs text-muted-foreground">Administrador</div>
+                  <div className="font-semibold">{user?.name ?? "Admin"}</div>
+                  <div className="text-xs text-muted-foreground">Super Admin</div>
                 </div>
               </div>
+              <button
+                id="logout-btn"
+                onClick={handleLogout}
+                title="Sair"
+                className="size-10 rounded-lg border border-border flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/40 hover:text-destructive transition-colors"
+              >
+                <LogOut className="size-4" />
+              </button>
             </div>
           </div>
         </header>
